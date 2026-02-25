@@ -1,31 +1,469 @@
-html {
-  font-size: 14px;
+:root {
+    --clinic-dark: #154360; /* Azul profundo */
+    --clinic-primary: #2471a3; /* Azul corporativo */
+    --clinic-accent: #d4e6f1; /* Azul muy claro para fondos */
+    --clinic-text: #2c3e50;
+    --border-color: #dee2e6;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--clinic-text);
+    background-color: #f8fafc;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* Contenedor Principal de Escritorio */
+.desktop-wrapper {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+/* Lado Izquierdo: Branding/Imagen */
+.auth-side-brand {
+    flex: 1.2;
+    background: linear-gradient(rgba(21, 67, 96, 0.85), rgba(21, 67, 96, 0.85)), url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=1000') no-repeat center center;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    padding: 40px;
+    text-align: center;
 }
 
-body {
-  margin-bottom: 60px;
+/* Lado Derecho: Formulario */
+.auth-side-form {
+    flex: 0.8;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 10%;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.05);
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+/* Estilos de Componentes */
+.clinic-logo-circle {
+    width: 80px;
+    height: 80px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    color: var(--clinic-primary);
+    font-size: 2rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.clinic-input-group {
+    margin-bottom: 1.5rem;
+}
+
+    .clinic-input-group label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #7f8c8d;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+.clinic-control {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 12px 15px;
+    width: 100%;
+    transition: all 0.2s;
+    background-color: #fcfcfc;
+}
+
+    .clinic-control:focus {
+        outline: none;
+        border-color: var(--clinic-primary);
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(36, 113, 163, 0.1);
+    }
+
+.btn-clinic-main {
+    background-color: var(--clinic-primary);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 6px;
+    font-weight: 700;
+    width: 100%;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+    .btn-clinic-main:hover {
+        background-color: var(--clinic-dark);
+    }
+
+
+/* DASHBOARD PATIENT*/
+/* Layout Interno */
+.main-content {
+    background-color: #f4f7f9;
+    min-height: calc(100vh - 70px);
+    padding: 2rem;
+}
+
+/* Header de la App */
+.clinic-navbar {
+    background-color: white;
+    border-bottom: 2px solid var(--clinic-accent);
+    height: 70px;
+}
+
+.nav-link-custom {
+    color: var(--clinic-text);
+    font-weight: 500;
+    margin: 0 1rem;
+    padding: 0.5rem 0;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+    .nav-link-custom:hover, .nav-link-custom.active {
+        color: var(--clinic-primary);
+        border-bottom: 2px solid var(--clinic-primary);
+    }
+
+/* Tarjetas de Dashboard */
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    height: 100%;
+}
+
+.icon-box {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.bg-soft-blue {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.bg-soft-red {
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+
+.bg-soft-green {
+    background-color: #e8f5e9;
+    color: #388e3c;
+}
+
+/* Listas de Citas y Medicamentos */
+.list-item-clinic {
+    border-left: 4px solid var(--clinic-primary);
+    background: #fff;
+    margin-bottom: 10px;
+    padding: 1rem;
+    border-radius: 0 8px 8px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+}
+
+.badge-status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+
+/* DASHBOARD v2*/
+/* Contenedor de Gráfico Simulado */
+.chart-container {
+    height: 120px;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    padding-top: 10px;
+}
+
+.chart-bar {
+    flex: 1;
+    background: var(--clinic-accent);
+    border-radius: 4px 4px 0 0;
+    transition: all 0.3s;
+    position: relative;
+}
+
+    .chart-bar:hover {
+        background: var(--clinic-primary);
+    }
+
+/* Tabla de analíticas compacta */
+.table-analytics {
+    font-size: 0.85rem;
+}
+
+    .table-analytics th {
+        color: #7f8c8d;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+    }
+
+/* Botones de acción refinados */
+.btn-action {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+/* DASHBOARD DOCTOR*/
+/* Estilos específicos para el Dashboard del Médico */
+.doctor-stat-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.2rem;
+    border-left: 4px solid var(--clinic-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    .doctor-stat-card .icon-wrapper {
+        font-size: 2rem;
+        color: var(--clinic-secondary);
+        opacity: 0.3;
+    }
+
+/* Tabla de Agenda Diaria */
+.table-agenda {
+    background: white;
+    margin-bottom: 0;
+}
+
+    .table-agenda th {
+        background-color: #f8fafc;
+        color: #5d6d7e;
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid var(--border-color);
+        padding: 12px 15px;
+    }
+
+    .table-agenda td {
+        vertical-align: middle;
+        padding: 12px 15px;
+        font-size: 0.9rem;
+        color: var(--clinic-text);
+        border-bottom: 1px solid #edf2f7;
+    }
+
+    .table-agenda tr:hover td {
+        background-color: #f4f7f9;
+    }
+
+/* Badges de Estado de Cita (Según tu SQL) */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-scheduled {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+}
+
+.status-ongoing {
+    background-color: #fff3e0;
+    color: #e65100;
+    border: 1px solid #ffe0b2;
+}
+
+.status-completed {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.status-cancelled {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+/* Botón de acción en tabla */
+.btn-table-action {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+}
+
+
+/* FICHA PACIENTE*/
+/* Perfil lateral del paciente */
+.patient-sidebar {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    overflow: hidden;
+}
+
+.patient-avatar-l {
+    width: 80px;
+    height: 80px;
+    background-color: var(--clinic-primary);
+    color: white;
+    font-size: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0 auto 15px auto;
+}
+
+/* Pestañas de la Historia Clínica */
+.clinic-tabs {
+    border-bottom: 2px solid #e9ecef;
+}
+
+    .clinic-tabs .nav-link {
+        color: #6c757d;
+        font-weight: 600;
+        border: none;
+        border-bottom: 3px solid transparent;
+        padding: 12px 20px;
+        margin-bottom: -2px;
+        transition: all 0.2s;
+    }
+
+        .clinic-tabs .nav-link:hover {
+            color: var(--clinic-primary);
+            border-color: #e9ecef;
+        }
+
+        .clinic-tabs .nav-link.active {
+            color: var(--clinic-primary);
+            border-bottom: 3px solid var(--clinic-primary);
+            background: transparent;
+        }
+
+/* Área de redacción (Doctor Notes) */
+.clinical-textarea {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 15px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 200px;
+    background-color: #fafbfc;
+}
+
+    .clinical-textarea:focus {
+        background-color: white;
+        border-color: var(--clinic-secondary);
+        outline: none;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.075), 0 0 0 3px rgba(93, 173, 226, 0.1);
+    }
+
+/* Formulario de Recetas */
+.prescription-form-box {
+    background-color: #f8fcfc;
+    border: 1px dashed var(--clinic-secondary);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+/* DASHBOARD ADMIN */
+/* Estilos del Entorno Admin */
+.admin-navbar {
+    background-color: #1a252f; /* Azul noche casi negro para denotar control */
+}
+
+    .admin-navbar .nav-link-custom {
+        color: #aeb6bf;
+    }
+
+        .admin-navbar .nav-link-custom:hover,
+        .admin-navbar .nav-link-custom.active {
+            color: white;
+            border-bottom: 2px solid var(--clinic-secondary);
+        }
+
+.admin-stat-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    position: relative;
+    overflow: hidden;
+}
+
+    .admin-stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background-color: var(--clinic-primary);
+    }
+
+.progress-metric {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #ecf0f1;
+    margin-top: 8px;
+}
+
+/* Tabla de gestión de usuarios */
+.table-admin {
+    font-size: 0.9rem;
+}
+
+    .table-admin th {
+        background-color: #f8f9fa;
+        color: #34495e;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+
+.badge-role-admin {
+    background-color: #34495e;
+    color: white;
+}
+
+.badge-role-doctor {
+    background-color: #2e86c1;
+    color: white;
+}
+
+.badge-role-patient {
+    background-color: #1abc9c;
+    color: white;
 }
