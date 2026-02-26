@@ -1,5 +1,6 @@
 using MageritHealth.Data;
 using MageritHealth.Repositories;
+using MageritHealth.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,7 +21,7 @@ builder.Services.AddDbContext<MageritHealthDbContext>(options =>
     options.UseSqlServer(connectionString);
 });
 
-builder.Services.AddTransient<UsersRepository>();
+builder.Services.AddTransient<IUsersRepository, UsersRepository>();
 
 var app = builder.Build();
 
@@ -41,10 +42,7 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}")
+app.MapControllerRoute(name: "default", pattern: "{controller=Account}/{action=Login}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();

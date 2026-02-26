@@ -1,15 +1,16 @@
-﻿using MageritHealth.Models;
+﻿using System.Threading.Tasks;
+using MageritHealth.Models;
 using MageritHealth.Repositories;
+using MageritHealth.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace MageritHealth.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UsersRepository repo;
+        private readonly IUsersRepository repo;
 
-        public AccountController(UsersRepository repo)
+        public AccountController(IUsersRepository repo)
         {
             this.repo = repo;
         }
@@ -56,9 +57,13 @@ namespace MageritHealth.Controllers
             else if (user.UserRole == "Admin")
             {
                 return RedirectToAction("Index", "Admin");
-            } else
+            }
+            else
             {
-                ModelState.AddModelError("", "Ha habido un problema al intentar iniciar sesión. Inténtelo de nuevo más tarde.");
+                ModelState.AddModelError(
+                    "",
+                    "Ha habido un problema al intentar iniciar sesión. Inténtelo de nuevo más tarde."
+                );
                 return View(model);
             }
         }

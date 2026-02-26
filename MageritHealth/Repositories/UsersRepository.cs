@@ -1,11 +1,12 @@
-﻿using MageritHealth.Data;
+﻿using System.Threading.Tasks;
+using MageritHealth.Data;
 using MageritHealth.Models;
+using MageritHealth.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace MageritHealth.Repositories
 {
-    public class UsersRepository
+    public class UsersRepository : IUsersRepository
     {
         private readonly MageritHealthDbContext context;
 
@@ -16,9 +17,23 @@ namespace MageritHealth.Repositories
 
         public async Task<User> GetUserByEmailAsync(string email, string password)
         {
-            User user = await this.context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Pass == password);
-
-            return user;
+            var consulta =
+                from data in this.context.Users
+                where data.Email == email && data.Pass == password
+                select data;
+            try
+            {
+                User user = await consulta.FirstOrDefaultAsync();
+                return user;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
+
+        public async Task InsertUser() { }
+
+        public async Task DisableUser(int userId) { }
     }
 }
