@@ -1,4 +1,4 @@
-namespace MageritHealth.Models
+namespace MageritHealth.Models.ViewModels
 {
     public class ErrorViewModel
     {

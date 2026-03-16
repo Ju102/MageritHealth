@@ -1,0 +1,203 @@
+﻿@using MageritHealth.Models
+@model Usuario
+
+@{
+    Layout = "_PacienteLayout";
+    ViewData["Title"] = "Perfil";
+}
+
+<div class="container mb-5">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold text-dark mb-1">
+                @Model.Nombre @Model.Apellido1 @Model.Apellido2
+                @if (Model.Activo)
+                {
+                    <span class="badge bg-success ms-2 fs-6 align-middle">Activo</span>
+                }
+                else
+                {
+                    <span class="badge bg-danger ms-2 fs-6 align-middle">Inactivo</span>
+                }
+            </h2>
+            <p class="text-muted mb-0">
+                <i class="bi bi-person-vcard me-1"></i> DNI: <span class="fw-bold me-3">@Model.Dni</span>
+                <i class="bi bi-shield-check me-1"></i> Nº Asegurado: <span class="fw-bold">@(Model.NumeroAsegurado ?? "Sin asignar")</span>
+            </p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a asp-controller="Paciente" asp-action="Dashboard" class="btn btn-outline-secondary btn-lg shadow-sm px-4 me-2">
+                <i class="bi bi-arrow-left me-2"></i>Volver
+            </a>
+            <a asp-controller="Paciente" asp-action="EditarPerfil" class="btn btn-primary btn-lg shadow-sm px-4">
+                <i class="bi bi-pencil-square me-2"></i>Editar
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+
+            <div class="patient-card p-4 mb-4 border-start border-primary border-5">
+                <h5 class="fw-bold mb-4"><i class="bi bi-person-lines-fill text-primary me-2"></i>Información Personal</h5>
+
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <small class="text-muted d-block fw-bold">Fecha de Nacimiento</small>
+                        <span class="fs-6">@Model.FechaNacimiento.ToString("dd/MM/yyyy")</span>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted d-block fw-bold">Género</small>
+                        <span class="fs-6 text-capitalize">@Model.Genero</span>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted d-block fw-bold">Teléfono</small>
+                        <span class="fs-6"><i class="bi bi-telephone text-muted me-1"></i>@Model.Telefono</span>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block fw-bold">Correo Electrónico</small>
+                        <span class="fs-6"><i class="bi bi-envelope text-muted me-1"></i>@Model.Email</span>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block fw-bold">Dirección Completa</small>
+                        <span class="fs-6"><i class="bi bi-geo-alt text-muted me-1"></i>@Model.Direccion</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="patient-card overflow-hidden border-start border-warning border-5">
+                <div class="p-4 border-bottom d-flex justify-content-between align-items-center bg-light">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-journal-medical text-warning me-2"></i>Antecedentes Médicos</h5>
+                    <button class="btn btn-sm btn-outline-warning text-dark"><i class="bi bi-plus"></i> Añadir</button>
+                </div>
+
+                @if (Model.Antecedentes != null && Model.Antecedentes.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="small text-muted">
+                                <tr>
+                                    <th class="ps-4">TIPO</th>
+                                    <th>DESCRIPCIÓN</th>
+                                    <th>FECHA</th>
+                                    <th>SEVERIDAD</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var ant in Model.Antecedentes.Where(a => a.Activo))
+                                {
+                                    <tr>
+                                        <td class="ps-4 text-capitalize fw-semibold">@ant.Tipo</td>
+                                        <td>
+                                            <div class="fw-bold text-dark">@ant.Nombre</div>
+                                            <div class="small text-muted">@ant.Notas</div>
+                                        </td>
+                                        <td>@(ant.FechaDiagnostico.ToString("MMM yyyy") ?? "Desconocida")</td>
+                                        <td>
+                                            @if (ant.Severidad == "grave" || ant.Severidad == "critica")
+                                            {
+                                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">@ant.Severidad.ToUpper()</span>
+                                            }
+                                            else if (ant.Severidad == "moderada")
+                                            {
+                                                <span class="badge bg-warning bg-opacity-10 text-warning border border-warning">@ant.Severidad.ToUpper()</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-info bg-opacity-10 text-info border border-info">@(ant.Severidad?.ToUpper() ?? "N/A")</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-5 text-center text-muted">
+                        <i class="bi bi-clipboard2-x fs-1 opacity-50 d-block mb-2"></i>
+                        No hay antecedentes médicos registrados.
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+
+            <div class="patient-card p-4 mb-4 border-start border-danger border-5">
+                <h6 class="fw-bold mb-3"><i class="bi bi-clipboard-pulse text-danger me-2"></i>Perfil Vital</h6>
+
+                @if (Model.InfoClinica != null)
+                {
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="p-3 bg-danger bg-opacity-10 rounded-3 text-center border border-danger border-opacity-25">
+                                <small class="text-danger d-block fw-bold">Grupo Sanguíneo</small>
+                                <span class="fw-bold fs-4 text-danger">@(Model.InfoClinica.GrupoSanguineo ?? "--")</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3 text-center border">
+                                <small class="text-muted d-block fw-bold">Peso Nacimiento</small>
+                                <span class="fw-bold fs-4">@(Model.InfoClinica.PesoNacimiento.ToString("0.00") ?? "--") <span class="fs-6">kg</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="text-muted opacity-25">
+
+                    <div>
+                        <small class="text-muted fw-bold d-block mb-1">Contacto de Emergencia</small>
+                        <div class="d-flex align-items-center p-2 bg-light rounded-3 border">
+                            <div class="bg-danger text-white rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                <i class="bi bi-telephone-fill"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark mb-0 lh-1">@(Model.InfoClinica.ContactoEmergenciaNombre ?? "No especificado")</div>
+                                <small class="text-danger fw-bold">@(Model.InfoClinica.ContactoEmergenciaTelefono ?? "--")</small>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted small text-center my-3">Información clínica no completada.</p>
+                }
+            </div>
+
+            <div class="patient-card p-4 border-start border-info border-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0"><i class="bi bi-people text-info me-2"></i>Equipo Médico</h6>
+                </div>
+
+                @if (Model.MedicosAsignados != null && Model.MedicosAsignados.Any())
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var asignacion in Model.MedicosAsignados)
+                        {
+                            <div class="list-group-item px-0 border-bottom-0 py-2 d-flex align-items-center">
+                                <div class="bg-info bg-opacity-10 text-info rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-person-badge fs-5"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">Dr./a. @asignacion.Doctor.Nombre @asignacion.Doctor.Apellido1</div>
+                                    <div class="small text-muted">@asignacion.Doctor.Especialidad?.NombreEspecialidad</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted small text-center my-3 border rounded p-3 bg-light">Este paciente no tiene médicos asignados actualmente.</p>
+                }
+            </div>
+
+            <div class="text-center mt-4">
+                <small class="text-muted"><i class="bi bi-clock-history me-1"></i> Paciente registrado el @Model.FechaCreacion.ToString("dd/MM/yyyy")</small>
+            </div>
+
+        </div>
+    </div>
+</div>

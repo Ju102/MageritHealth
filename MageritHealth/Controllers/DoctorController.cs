@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MageritHealth.Filters;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MageritHealth.Controllers
 {
+    [AuthorizeUsers(Policy = "DoctorOnly")]
     public class DoctorController : Controller
     {
         public IActionResult Index()
@@ -9,7 +11,7 @@ namespace MageritHealth.Controllers
             return View();
         }
 
-        public IActionResult Consulta()
+        public IActionResult Dashboard()
         {
             return View();
         }

@@ -1,0 +1,57 @@
+﻿@{
+    ViewData["Title"] = "Acceso Restringido";
+    // Usamos el layout de login porque es más limpio para pantallas de error
+    Layout = "_LoginLayout";
+}
+
+<div class="col-12 col-md-10 col-lg-6">
+    <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="row g-0">
+            <div class="col-md-4 bg-danger bg-opacity-10 d-flex align-items-center justify-content-center p-4">
+                <i class="bi bi-shield-lock-fill text-danger" style="font-size: 6rem;"></i>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card-body p-5">
+                    <h2 class="fw-bold text-dark mb-3">Acceso Restringido</h2>
+                    <p class="text-muted mb-4">
+                        Lo sentimos, pero <b>no tienes los permisos necesarios</b> para acceder a esta sección de la clínica.
+                        Esta área está reservada exclusivamente para personal autorizado.
+                    </p>
+
+                    <hr class="my-4 opacity-25">
+
+                    <div class="d-grid gap-3">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            string destino = "Paciente";
+                            if (User.IsInRole("admin")) destino = "Admin";
+                            else if (User.IsInRole("doctor")) destino = "Doctor";
+
+                            <a asp-controller="@destino" asp-action="Dashboard" class="btn btn-primary btn-lg rounded-3 fw-bold shadow-sm">
+                                <i class="bi bi-house-door-fill me-2"></i>Volver a mi Panel
+                            </a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg rounded-3 fw-bold shadow-sm">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Ir al Inicio de Sesión
+                            </a>
+                        }
+
+                        <a href="javascript:history.back()" class="btn btn-link text-decoration-none text-muted small">
+                            <i class="bi bi-arrow-left me-1"></i>Regresar a la página anterior
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <p class="text-muted small">
+            Si crees que esto es un error, contacta con el administrador del sistema.<br>
+            &copy; @DateTime.Now.Year Magerit Health - Seguridad Interna
+        </p>
+    </div>
+</div>

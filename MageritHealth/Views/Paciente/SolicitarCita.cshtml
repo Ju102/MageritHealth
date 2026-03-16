@@ -1,0 +1,153 @@
+﻿@using MageritHealth.Models.ViewModels
+@model SolicitarCitaViewModel
+@{
+    Layout = "_PacienteLayout";
+    ViewData["Title"] = "Solicitar Cita";
+}
+
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-0">Nueva Cita Médica</h3>
+            <p class="text-muted small">Selecciona el especialista y el horario que mejor te convenga.</p>
+        </div>
+        <a asp-controller="Paciente" asp-action="Dashboard" class="btn btn-outline-secondary rounded-3 fw-bold">
+            <i class="bi bi-arrow-left me-2"></i>Volver al Panel
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="patient-card shadow-sm overflow-hidden">
+                <div class="p-4 bg-primary bg-opacity-10 border-bottom border-primary border-opacity-25">
+                    <h5 class="fw-bold text-primary mb-0">
+                        <i class="bi bi-calendar-plus-fill me-2"></i>Formulario de Solicitud
+                    </h5>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <form asp-controller="Paciente" asp-action="SolicitarCita" method="post">
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3" role="alert"></div>
+
+                        <div class="row g-4 mb-5">
+                            <div class="col-12">
+                                <h6 class="fw-bold text-dark border-start border-primary border-4 ps-2 mb-3">1. Selección de Especialista</h6>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="IdEspecialidad" class="form-label small fw-bold text-muted"></label>
+                                <select asp-for="IdEspecialidad" asp-items="ViewBag.Especialidades" class="form-select form-select-lg rounded-3" id="selectEspecialidad">
+                                    <option selected value="">-- Selecciona Especialidad --</option>
+                                </select>
+                                <span asp-validation-for="IdEspecialidad" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="IdDoctor" class="form-label small fw-bold text-muted"></label>
+                                <select asp-for="IdDoctor" class="form-select form-select-lg rounded-3" id="selectDoctor" disabled>
+                                    <option selected value="">-- Selecciona primero especialidad --</option>
+                                </select>
+                                <span asp-validation-for="IdDoctor" class="text-danger small"></span>
+                                <div class="form-text small">Los médicos disponibles se cargarán automáticamente.</div>
+                            </div>
+                        </div>
+
+                        <div class="row g-4 mb-5">
+                            <div class="col-12">
+                                <h6 class="fw-bold text-dark border-start border-info border-4 ps-2 mb-3">2. Agenda y Horario</h6>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Fecha" class="form-label small fw-bold text-muted"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar3"></i></span>
+                                    <input asp-for="Fecha" type="date" class="form-control form-control-lg border-start-0 ps-0" min="@DateTime.Now.ToString("yyyy-MM-dd")">
+                                </div>
+                                <span asp-validation-for="Fecha" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Hora" class="form-label small fw-bold text-muted"></label>
+                                <select asp-for="Hora" class="form-select form-select-lg rounded-3">
+                                    <option selected value="">-- Selecciona Hora --</option>
+                                    <option value="09:00">09:00 AM</option>
+                                    <option value="09:30">09:30 AM</option>
+                                    <option value="10:00">10:00 AM</option>
+                                    <option value="10:30">10:30 AM</option>
+                                    <option value="11:00">11:00 AM</option>
+                                    <option value="11:30">11:30 AM</option>
+                                    <option value="12:00">12:00 PM</option>
+                                </select>
+                                <span asp-validation-for="Hora" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row g-4 mb-4">
+                            <div class="col-12">
+                                <h6 class="fw-bold text-dark border-start border-warning border-4 ps-2 mb-3">3. Motivo de la Consulta</h6>
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Motivo" class="form-label small fw-bold text-muted">¿Cuál es el motivo de tu visita?</label>
+                                <textarea asp-for="Motivo" class="form-control rounded-4" rows="4" placeholder="Describe brevemente tus síntomas o el motivo de la revisión..."></textarea>
+                                <span asp-validation-for="Motivo" class="text-danger small"></span>
+                                <div class="form-text">Esta información ayudará al médico a prepararse mejor para tu consulta.</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-3 mt-5 pt-4 border-top">
+                            <button type="reset" class="btn btn-light btn-lg px-4 rounded-3 fw-bold">Limpiar</button>
+                            <button type="submit" class="btn btn-request btn-lg px-5 shadow text-white" style="background-color: #0ea5e9;">
+                                <i class="bi bi-check-circle me-2"></i>Confirmar Solicitud
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="mt-4 p-3 bg-white rounded-4 border shadow-sm d-flex align-items-center">
+                <div class="p-2 bg-warning bg-opacity-10 text-warning rounded-circle me-3">
+                    <i class="bi bi-info-circle-fill fs-5"></i>
+                </div>
+                <p class="mb-0 small text-muted">
+                    <b>Recuerda:</b> Si necesitas una cita de urgencia inmediata, por favor acude directamente al centro de salud o llama al 112.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            $("#selectEspecialidad").change(function () {
+                var especialidadId = $(this).val();
+                var selectDoctor = $("#selectDoctor");
+
+                selectDoctor.empty();
+
+                if (especialidadId) {
+                    selectDoctor.prop("disabled", false);
+                    selectDoctor.append('<option value="">Cargando médicos...</option>');
+
+                    // Llamada AJAX al controlador para traer los doctores de esta especialidad
+                    $.getJSON('@Url.Action("GetDoctoresPorEspecialidad", "Paciente")', { idEspecialidad: especialidadId }, function (data) {
+                        selectDoctor.empty();
+                        selectDoctor.append('<option value="">-- Selecciona un Médico --</option>');
+
+                        $.each(data, function (index, item) {
+                            selectDoctor.append('<option value="' + item.value + '">' + item.text + '</option>');
+                        });
+                    });
+                } else {
+                    selectDoctor.prop("disabled", true);
+                    selectDoctor.append('<option value="">-- Selecciona primero especialidad --</option>');
+                }
+            });
+        });
+    </script>
+}

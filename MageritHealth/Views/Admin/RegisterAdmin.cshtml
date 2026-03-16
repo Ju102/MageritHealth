@@ -1,0 +1,93 @@
+﻿@using MageritHealth.Models.ViewModels
+@model AdminRegisterViewModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Alta de Administrador";
+}
+
+<div class="container mb-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-0">Alta de Personal Administrativo</h3>
+            <p class="text-muted small">Cuentas con acceso total al Centro de Control.</p>
+        </div>
+        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-secondary fw-bold">
+            <i class="bi bi-arrow-left me-2"></i>Volver al Panel
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4 p-md-5">
+
+            @Html.AntiForgeryToken()
+            <form method="post">
+                <h6 class="fw-bold text-warning text-darken mb-3 border-bottom pb-2">
+                    <i class="bi bi-shield-lock-fill me-2"></i>Datos del Administrador
+                </h6>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold text-muted">Nombre *</label>
+                        <input asp-for="Nombre" class="form-control" />
+                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold text-muted">Primer Apellido *</label>
+                        <input asp-for="Apellido1" class="form-control" />
+                        <span asp-validation-for="Apellido1" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold text-muted">Segundo Apellido (opcional)</label>
+                        <input asp-for="Apellido2" class="form-control" />
+                        <span asp-validation-for="Apellido2" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted">DNI / Pasaporte *</label>
+                        <input asp-for="Dni" class="form-control" />
+                        <span asp-validation-for="Dni" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted">Fecha Nacimiento *</label>
+                        <input asp-for="FechaNacimiento" type="date" class="form-control" />
+                        <span asp-validation-for="FechaNacimiento" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted">Género *</label>
+                        <select asp-for="Genero" class="form-select">
+                            <option value="">Seleccionar...</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="femenino">Femenino</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                        <span asp-validation-for="Genero" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted">Teléfono *</label>
+                        <input asp-for="Telefono" class="form-control" />
+                        <span asp-validation-for="Telefono" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label small fw-bold text-muted">Dirección Completa *</label>
+                        <input asp-for="Direccion" class="form-control" />
+                        <span asp-validation-for="Direccion" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="text-end mt-4 pt-3 border-top">
+                    <button type="submit" class="btn btn-warning btn-lg px-5 rounded-3 fw-bold text-dark">
+                        <i class="bi bi-shield-check me-2"></i>Crear Administrador
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

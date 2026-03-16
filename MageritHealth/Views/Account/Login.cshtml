@@ -1,48 +1,59 @@
-﻿@model LoginViewModel
+﻿@using MageritHealth.Models.ViewModels
+@model LoginViewModel
 @{
-    ViewData["Title"] = "Acceso";
     Layout = "_LoginLayout";
+    ViewData["Title"] = "Acceso";
 }
 
-<div class="desktop-wrapper">
-    <div class="auth-side-brand d-none d-lg-flex">
-        <div class="clinic-logo-circle">
-            <i class="bi bi-hospital-fill"></i>
-        </div>
-        <h1 class="display-4 fw-bold">Magerit Health</h1>
-        <p class="lead">Portal de Gestión de Citas y Prescripciones</p>
-        <div class="mt-4 small opacity-75">
-            &copy; @DateTime.Now.Year - Clínica Magerit Health
+<div class="col-12 col-md-8 col-lg-4">
+
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-5">
+
+            <div class="text-center mb-4">
+                <i class="bi bi-heart-pulse text-primary" style="font-size: 3.5rem;"></i>
+                <h2 class="fw-bold mt-2 text-dark">Magerit Health</h2>
+                <p class="text-muted small">Portal de Salud Integrado</p>
+            </div>
+
+            @Html.AntiForgeryToken()
+            <form asp-controller="Account" asp-action="Login" method="post">
+
+                <div asp-validation-summary="ModelOnly" class="alert bg-danger-subtle border border-danger border-2 text-danger rounded-3 shadow-sm login-validation-summary" role="alert"></div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="LoginEmail" class="form-control rounded-3" placeholder="nombre.apellido@magerithealth.com">
+                    <label for="LoginEmail">Correo electrónico</label>
+                    <span asp-validation-for="LoginEmail" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input asp-for="LoginPassword" type="password" class="form-control rounded-3" placeholder="Contraseña">
+                    <label for="LoginPassword">Contraseña</label>
+                    <span asp-validation-for="LoginPassword" class="text-danger small"></span>
+                </div>
+
+                <div class="d-grid gap-2 mb-3">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold">
+                        Iniciar Sesión
+                    </button>
+                </div>
+
+                <div class="text-center">
+                    <a href="#" class="text-decoration-none small text-muted">¿Has olvidado tu contraseña?</a>
+                </div>
+
+            </form>
         </div>
     </div>
 
-    <div class="auth-side-form">
-        <div class="mb-5">
-            <h2 class="fw-bold">¡Bienvenido!</h2>
-            <p class="text-muted">Por favor, introduce tus credenciales para acceder.</p>
-        </div>
-
-        <form method="post">
-            <div class="clinic-input-group">
-                <label asp-for="LoginEmail">Correo Electrónico</label>
-                <input asp-for="LoginEmail" class="clinic-control" placeholder="usuario@clinica.com" />
-                <span class="text-danger small" asp-validation-for="LoginEmail"></span>
-            </div>
-
-            <div class="clinic-input-group">
-                <label asp-for="LoginPassword">Contraseña</label>
-                <input asp-for="LoginPassword" type="password" class="clinic-control" placeholder="••••••••" />
-                <span class="text-danger small" asp-validation-for="LoginPassword"></span>
-            </div>
-
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div></div>
-                <a href="#" class="small text-decoration-none">¿Problemas con el acceso?</a>
-            </div>
-
-            <button type="submit" class="btn-clinic-main">
-                <i class="bi bi-box-arrow-in-right me-2"></i> Iniciar Sesión
-            </button>
-        </form>
+    <div class="text-center mt-4">
+        <p class="text-muted small">&copy; @DateTime.Now.Year Magerit Health. Todos los derechos reservados.</p>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

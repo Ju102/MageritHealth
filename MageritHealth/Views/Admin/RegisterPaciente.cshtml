@@ -1,0 +1,108 @@
+﻿@using MageritHealth.Models.ViewModels
+@model PacienteRegisterViewModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Alta de Paciente";
+}
+
+<div class="container mb-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-0">Alta de Nuevo Paciente</h3>
+            <p class="text-muted small">Registro en el sistema clínico (Email autogenerado).</p>
+        </div>
+        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-secondary fw-bold">
+            <i class="bi bi-arrow-left me-2"></i>Volver al Panel
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4 p-md-5">
+
+            <form asp-controller="Admin" asp-action="RegisterPaciente" method="post">
+
+                <div asp-validation-summary="ModelOnly" class="alert bg-white border border-danger border-2 text-danger rounded-3 shadow-sm login-validation-summary mb-4" role="alert"></div>
+
+                <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">
+                    <i class="bi bi-person-lines-fill me-2"></i>Datos Personales
+                </h6>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label asp-for="Nombre" class="form-label small fw-bold text-muted">Nombre <span class="text-danger">*</span></label>
+                        <input asp-for="Nombre" class="form-control" placeholder="Ej: Juan" />
+                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Apellido1" class="form-label small fw-bold text-muted">Primer Apellido <span class="text-danger">*</span></label>
+                        <input asp-for="Apellido1" class="form-control" />
+                        <span asp-validation-for="Apellido1" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Apellido2" class="form-label small fw-bold text-muted">Segundo Apellido</label>
+                        <input asp-for="Apellido2" class="form-control" />
+                        <span asp-validation-for="Apellido2" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="Dni" class="form-label small fw-bold text-muted">DNI / Pasaporte <span class="text-danger">*</span></label>
+                        <input asp-for="Dni" class="form-control" />
+                        <span asp-validation-for="Dni" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="FechaNacimiento" class="form-label small fw-bold text-muted">Fecha Nacimiento <span class="text-danger">*</span></label>
+                        <input asp-for="FechaNacimiento" type="date" class="form-control" />
+                        <span asp-validation-for="FechaNacimiento" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="Genero" class="form-label small fw-bold text-muted">Género <span class="text-danger">*</span></label>
+                        <select asp-for="Genero" class="form-select">
+                            <option value="">Seleccionar...</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="femenino">Femenino</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                        <span asp-validation-for="Genero" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="Telefono" class="form-label small fw-bold text-muted">Teléfono <span class="text-danger">*</span></label>
+                        <input asp-for="Telefono" class="form-control" placeholder="Ej: 600123456" />
+                        <span asp-validation-for="Telefono" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Direccion" class="form-label small fw-bold text-muted">Dirección Completa <span class="text-danger">*</span></label>
+                        <input asp-for="Direccion" class="form-control" placeholder="Calle, Número, Piso, Ciudad..." />
+                        <span asp-validation-for="Direccion" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold text-success mb-3 border-bottom pb-2 mt-4">
+                    <i class="bi bi-file-medical-fill me-2"></i>Datos Médicos
+                </h6>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label asp-for="NumeroAsegurado" class="form-label small fw-bold text-muted">Nº de Asegurado <span class="text-danger">*</span></label>
+                        <input asp-for="NumeroAsegurado" class="form-control border-success border-opacity-50" placeholder="Ej: ASEG-001" />
+                        <span asp-validation-for="NumeroAsegurado" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="text-end mt-4 pt-3 border-top">
+                    <button type="submit" class="btn btn-primary btn-lg px-5 rounded-3 fw-bold">
+                        <i class="bi bi-check-circle me-2"></i>Registrar Paciente
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

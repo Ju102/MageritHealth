@@ -1,27 +1,59 @@
 using MageritHealth.Data;
 using MageritHealth.Repositories;
 using MageritHealth.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDistributedMemoryCache();
+// Servicios (Dependency Injection Configuration / Configuración de la inyección de dependencias) //
 
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(5);
-});
+builder.Services.AddAntiforgery();
 
-builder.Services.AddControllersWithViews();
-
-string connectionString = builder.Configuration.GetConnectionString("MageritHealthConnection");
+string connectionString = builder.Configuration.GetConnectionString("MageritHealthConnection")
+    ?? throw new InvalidOperationException("No se encontró la cadena de conexión 'MageritHealthConnection'.");
 
 builder.Services.AddDbContext<MageritHealthDbContext>(options =>
 {
     options.UseSqlServer(connectionString);
 });
 
-builder.Services.AddTransient<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<IUsuariosRepository, UsuariosRepository>(); // usuarios, especialidades y credenciales
+builder.Services.AddScoped<ICitasRepository, CitasRepository>(); // citas
+
+builder.Services.AddScoped<IPrescripcionesRepository, PrescripcionesRepository>(); // prescripciones y medicamentos
+
+builder.Services.AddScoped<IAnaliticasRepository, AnaliticasRepository>(); // analiticas, mediciones y tipos_mediciones
+
+builder.Services.AddScoped<IInfoClinicaRepository, InfoClinicaRepository>(); // info_clinica y antecedentes
+
+builder.Services.AddMemoryCache();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(10);
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("DoctorOnly", policy => policy.RequireRole("doctor"));
+    options.AddPolicy("PacienteOnly", policy => policy.RequireRole("paciente"));
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("admin"));
+});
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+}).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, config =>
+{
+    config.AccessDeniedPath = "/Account/AccesoDenegado";
+});
+
+builder.Services.AddControllersWithViews(options => options.EnableEndpointRouting = false).AddSessionStateTempDataProvider();
+
+// Middleware (HTTP Request Pipeline Configuration / Configuración de la tubería de solicitudes HTTP) //
 
 var app = builder.Build();
 
@@ -34,15 +66,23 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseRouting();
-
+app.UseStaticFiles();
+// app.UseRouting();
 app.UseSession();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
+// app.MapStaticAssets();
 
-app.MapControllerRoute(name: "default", pattern: "{controller=Account}/{action=Login}/{id?}")
-    .WithStaticAssets();
+app.UseMvc(routes =>
+{
+    routes.MapRoute(
+        name: "default",
+        template: "{controller=Account}/{action=Login}/{id?}");
+});
+
+//app.MapControllerRoute(name: "default", pattern: "{controller=Account}/{action=Login}/{id?}")
+//    .WithStaticAssets();
 
 app.Run();

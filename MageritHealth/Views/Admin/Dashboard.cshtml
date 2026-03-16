@@ -1,0 +1,224 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container">
+    @if (ViewData["mensaje"] != null)
+    {
+        <div>
+            <p>@TempData["mensaje"].ToString()</p>
+        </div>
+    }
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-0">Centro de Control Global</h3>
+            <p class="text-muted small">Resumen del sistema clínico y accesos rápidos.</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a class="btn btn-clinic-main fw-bold" asp-controller="Admin" asp-action="RegisterDoctor">
+                <i class="bi bi-person-plus-fill me-2"></i>Nuevo Doctor
+            </a>
+
+            <a class="btn btn-clinic-main fw-bold" asp-controller="Admin" asp-action="RegisterPaciente">
+                <i class="bi bi-person-plus-fill me-2"></i>Nuevo Paciente
+            </a>
+
+            <a class="btn btn-clinic-main bg-warning fw-bold" asp-controller="Admin" asp-action="RegisterAdmin">
+                <i class="bi bi-person-plus-fill me-2"></i>Nuevo Admin
+            </a>
+        </div>
+    </div>
+
+    <!-- MÉTRICAS PRINCIPALES -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-3">
+            <div class="admin-stat-card border-start border-primary border-4">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-muted small fw-bold">PACIENTES REGISTRADOS</div>
+                        <div class="fs-3 fw-bold">3</div>
+                    </div>
+                    <i class="bi bi-people fs-3 text-primary"></i>
+                </div>
+                <div class="small text-muted mt-2">Usuarios con rol paciente</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="admin-stat-card border-start border-info border-4">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-muted small fw-bold">DOCTORES ACTIVOS</div>
+                        <div class="fs-3 fw-bold">2</div>
+                    </div>
+                    <i class="bi bi-heart-pulse fs-3 text-info"></i>
+                </div>
+                <div class="small text-muted mt-2">3 especialidades médicas</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="admin-stat-card border-start border-warning border-4">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-muted small fw-bold">CITAS PROGRAMADAS</div>
+                        <div class="fs-3 fw-bold">2</div>
+                    </div>
+                    <i class="bi bi-calendar-check fs-3 text-warning"></i>
+                </div>
+                <div class="small text-muted mt-2">Pendientes de realizar</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="admin-stat-card border-start border-success border-4">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-muted small fw-bold">ANALÍTICAS PENDIENTES</div>
+                        <div class="fs-3 fw-bold">1</div>
+                    </div>
+                    <i class="bi bi-clipboard-pulse fs-3 text-success"></i>
+                </div>
+                <div class="small text-muted mt-2">Programadas o en progreso</div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ACCESOS RÁPIDOS -->
+
+    <div class="bg-white rounded-4 shadow-sm p-4 mb-5">
+
+        <h6 class="fw-bold text-muted mb-3">
+            <i class="bi bi-gear-fill me-2"></i>Accesos Rápidos
+        </h6>
+
+        <div class="row g-3">
+
+            <div class="col-md-3">
+                <button class="btn btn-outline-secondary w-100 p-3">
+                    <i class="bi bi-people fs-3 d-block mb-1"></i>
+                    Gestionar Usuarios
+                </button>
+            </div>
+
+            <div class="col-md-3">
+                <button class="btn btn-outline-secondary w-100 p-3">
+                    <i class="bi bi-calendar fs-3 d-block mb-1"></i>
+                    Gestionar Citas
+                </button>
+            </div>
+
+            <div class="col-md-3">
+                <button class="btn btn-outline-secondary w-100 p-3">
+                    <i class="bi bi-prescription2 fs-3 d-block mb-1"></i>
+                    Medicamentos
+                </button>
+            </div>
+
+            <div class="col-md-3">
+                <button class="btn btn-outline-secondary w-100 p-3">
+                    <i class="bi bi-tag fs-3 d-block mb-1"></i>
+                    Especialidades
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PRÓXIMAS CITAS -->
+
+    <div class="card shadow-sm border-0 mb-5">
+
+        <div class="card-header bg-white">
+            <h6 class="fw-bold mb-0">
+                <i class="bi bi-calendar-week me-2 text-primary"></i>
+                Próximas Citas
+            </h6>
+        </div>
+
+        <div class="card-body p-0">
+
+            <table class="table table-hover mb-0">
+
+                <thead class="table-light small text-muted">
+                    <tr>
+                        <th>Paciente</th>
+                        <th>Doctor</th>
+                        <th>Motivo</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>Mario García Ramos</td>
+                        <td>Dr. Elena Martín</td>
+                        <td>Control de marcapasos</td>
+                        <td>20 Jun 2024 - 09:00</td>
+                        <td><span class="badge bg-warning text-dark">Programada</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>Mario García Pérez</td>
+                        <td>Dr. Elena Martín</td>
+                        <td>Resultados analítica</td>
+                        <td>25 Jun 2024 - 12:00</td>
+                        <td><span class="badge bg-warning text-dark">Programada</span></td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- ACTIVIDAD RECIENTE -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white">
+            <h6 class="fw-bold mb-0">
+                <i class="bi bi-clock-history me-2 text-primary"></i>
+                Actividad reciente
+            </h6>
+        </div>
+
+        <div class="card-body">
+
+            <ul class="list-group list-group-flush">
+
+                <li class="list-group-item">
+                    <i class="bi bi-person-plus text-success me-2"></i>
+                    Nuevo paciente registrado: <b>Lucía Jiménez</b>
+                </li>
+
+                <li class="list-group-item">
+                    <i class="bi bi-capsule text-primary me-2"></i>
+                    Prescripción creada: <b>Amoxicilina</b>
+                </li>
+
+                <li class="list-group-item">
+                    <i class="bi bi-clipboard-data text-warning me-2"></i>
+                    Analítica completada para <b>Mario García</b>
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</div>
