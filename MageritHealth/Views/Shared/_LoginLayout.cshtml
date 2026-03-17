@@ -1,18 +1,82 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MageritHealth</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - Magerit Health</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MageritHealth.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"> @* Temporal, hasta añadir el logo *@
-</head>
-<body class="bg-light">
 
-    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <style>
+        :root {
+            --mh-primary: #0d6efd;
+            --mh-accent: #0dcaf0;
+            --mh-bg-gradient-start: #f8fafc;
+            --mh-bg-gradient-end: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--mh-bg-gradient-start);
+            /* Gradiente diagonal elegante y suave */
+            background-image: linear-gradient(135deg, var(--mh-bg-gradient-start) 0%, #dbeafe 100%);
+            min-height: 100vh;
+            color: #334155;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Tarjeta principal flotante */
+        .auth-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0,0,0,0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Inputs estilizados */
+        .form-control {
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid #cbd5e1;
+            background-color: #f8fafc;
+            transition: all 0.2s;
+        }
+
+            .form-control:focus {
+                background-color: #ffffff;
+                border-color: var(--mh-primary);
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            }
+
+        /* Botón de acción principal */
+        .btn-auth {
+            background: linear-gradient(135deg, var(--mh-primary) 0%, #0a58ca 100%);
+            color: white;
+            border: none;
+            border-radius: 50rem;
+            font-weight: 600;
+            padding: 0.8rem 1.5rem;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
+            transition: all 0.3s ease;
+        }
+
+            .btn-auth:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3);
+                color: white;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="container d-flex flex-column justify-content-center align-items-center min-vh-100 py-5">
         @RenderBody()
     </div>
 

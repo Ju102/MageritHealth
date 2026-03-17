@@ -12,7 +12,6 @@ namespace MageritHealth.Data
         public DbSet<AntecedenteMedico> AntecedentesMedicos { get; set; }
         public DbSet<Cita> Citas { get; set; }
         public DbSet<Credencial> Credenciales { get; set; }
-        public DbSet<DoctorPaciente> DoctoresPacientes { get; set; }
         public DbSet<Especialidad> Especialidades { get; set; }
         public DbSet<InfoClinicaPaciente> InfoClinicaPacientes { get; set; }
         public DbSet<Medicamento> Medicamentos { get; set; }
@@ -46,17 +45,42 @@ namespace MageritHealth.Data
                 .HasForeignKey(u => u.IdEspecialidad)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<DoctorPaciente>()
-            .HasOne(dp => dp.Paciente)
-            .WithMany(u => u.MedicosAsignados)
-            .HasForeignKey(dp => dp.IdPaciente)
-            .OnDelete(DeleteBehavior.Restrict);
+            // Indicar que la relación con Credenciales es 1:1
+            modelBuilder.Entity<Usuario>()
+                .HasOne(u => u.Credencial)
+                .WithOne(c => c.Usuario)
+                .HasForeignKey<Credencial>(c => c.IdUsuario);
 
-            modelBuilder.Entity<DoctorPaciente>()
-                .HasOne(dp => dp.Doctor)
-                .WithMany(u => u.PacientesAsignados)
-                .HasForeignKey(dp => dp.IdDoctor)
-                .OnDelete(DeleteBehavior.Restrict);
+            // Para las mediciones (Glucosa, Peso, etc.)
+            modelBuilder.Entity<Medicion>()
+                .Property(m => m.ValorMedicion)
+                .HasPrecision(10, 2);
+
+            // Para los tipos de medicion (Rangos)
+            modelBuilder.Entity<TipoMedicion>()
+                .Property(tm => tm.ValorMaximo).HasPrecision(10, 2);
+            modelBuilder.Entity<TipoMedicion>()
+                .Property(tm => tm.ValorMinimo).HasPrecision(10, 2);
+
+            // Para la info clínica (Peso)
+            modelBuilder.Entity<InfoClinicaPaciente>()
+                .Property(i => i.PesoActual).HasPrecision(5, 2);
+
+            // Indicar que el Dni es unico
+            modelBuilder.Entity<Usuario>()
+                .HasIndex(u => u.Dni)
+                .IsUnique();
+
+            // Indicar que el email es unico
+            modelBuilder.Entity<Usuario>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
+            // Indicar que la relación con InfoClinicaPaciente es 1:1
+            modelBuilder.Entity<Usuario>()
+                .HasOne(u => u.InfoClinica)
+                .WithOne(i => i.Paciente) // Asumiendo que pusiste "public virtual Usuario Paciente { get; set; }" en InfoClinicaPaciente
+                .HasForeignKey<InfoClinicaPaciente>(i => i.IdPaciente);
         }
     }
 }

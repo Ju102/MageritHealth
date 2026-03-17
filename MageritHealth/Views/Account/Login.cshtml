@@ -5,50 +5,53 @@
     ViewData["Title"] = "Acceso";
 }
 
-<div class="col-12 col-md-8 col-lg-4">
+<div class="col-12 col-md-8 col-lg-5 col-xl-4 w-100" style="max-width: 450px;">
 
-    <div class="card shadow-lg border-0 rounded-4">
-        <div class="card-body p-5">
+    <div class="card auth-card border-0">
+        <div class="card-body p-4 p-md-5">
 
-            <div class="text-center mb-4">
-                <i class="bi bi-heart-pulse text-primary" style="font-size: 3.5rem;"></i>
-                <h2 class="fw-bold mt-2 text-dark">Magerit Health</h2>
-                <p class="text-muted small">Portal de Salud Integrado</p>
+            <div class="text-center mb-5">
+                <div class="d-inline-flex justify-content-center align-items-center bg-primary bg-opacity-10 rounded-circle mb-3" style="width: 80px; height: 80px;">
+                    <i class="bi bi-heart-pulse text-primary" style="font-size: 2.5rem;"></i>
+                </div>
+                <h3 class="fw-bold text-dark mb-1 tracking-tight">Magerit <span class="text-primary">Health</span></h3>
+                <p class="text-muted small fw-medium text-uppercase tracking-wide">Portal de Salud Integrado</p>
             </div>
 
             @Html.AntiForgeryToken()
-            <form asp-controller="Account" asp-action="Login" method="post">
+            <form asp-controller="Account" asp-action="Login" method="post" class="needs-validation">
 
-                <div asp-validation-summary="ModelOnly" class="alert bg-danger-subtle border border-danger border-2 text-danger rounded-3 shadow-sm login-validation-summary" role="alert"></div>
+                <div asp-validation-summary="ModelOnly" class="alert bg-danger bg-opacity-10 border border-danger border-opacity-25 text-danger rounded-3 small p-3 mb-4 d-flex align-items-center shadow-sm" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                    <div></div>
+                </div>
 
                 <div class="form-floating mb-3">
-                    <input asp-for="LoginEmail" class="form-control rounded-3" placeholder="nombre.apellido@magerithealth.com">
-                    <label for="LoginEmail">Correo electrónico</label>
-                    <span asp-validation-for="LoginEmail" class="text-danger small"></span>
+                    <input asp-for="LoginEmail" class="form-control" placeholder="">
+                    <label for="LoginEmail" class="text-muted"><i class="bi bi-envelope me-2"></i>Email</label>
+                    <span asp-validation-for="LoginEmail" class="text-danger small mt-1 d-block ms-1"></span>
                 </div>
 
                 <div class="form-floating mb-4">
-                    <input asp-for="LoginPassword" type="password" class="form-control rounded-3" placeholder="Contraseña">
-                    <label for="LoginPassword">Contraseña</label>
-                    <span asp-validation-for="LoginPassword" class="text-danger small"></span>
+                    <input asp-for="LoginPassword" type="password" class="form-control" placeholder="">
+                    <label for="LoginPassword" class="text-muted"><i class="bi bi-lock me-2"></i>Contraseña</label>
+                    <span asp-validation-for="LoginPassword" class="text-danger small mt-1 d-block ms-1"></span>
                 </div>
 
-                <div class="d-grid gap-2 mb-3">
-                    <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold">
-                        Iniciar Sesión
+                <div class="d-grid mb-4">
+                    <button type="submit" class="btn btn-auth fs-5">
+                        Iniciar Sesión <i class="bi bi-arrow-right-short ms-1 fs-4 align-middle"></i>
                     </button>
-                </div>
-
-                <div class="text-center">
-                    <a href="#" class="text-decoration-none small text-muted">¿Has olvidado tu contraseña?</a>
                 </div>
 
             </form>
         </div>
     </div>
 
-    <div class="text-center mt-4">
-        <p class="text-muted small">&copy; @DateTime.Now.Year Magerit Health. Todos los derechos reservados.</p>
+    <div class="text-center mt-5">
+        <p class="text-muted small fw-medium opacity-75">
+            &copy; @DateTime.Now.Year Magerit Health.<br class="d-sm-none"> Todos los derechos reservados.
+        </p>
     </div>
 </div>
 

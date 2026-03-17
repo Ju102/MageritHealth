@@ -45,10 +45,5 @@ namespace MageritHealth.Models
         [InverseProperty("Doctor")]
         public virtual ICollection<Cita> CitasComoDoctor { get; set; }
         
-        [InverseProperty("Paciente")]
-        public virtual ICollection<DoctorPaciente> MedicosAsignados { get; set; } // Solo para pacientes, lista de doctores asignados
-        [InverseProperty("Doctor")]
-        public virtual ICollection<DoctorPaciente> PacientesAsignados { get; set; } // Solo para doctores, lista de pacientes asignados
-
     }
 }

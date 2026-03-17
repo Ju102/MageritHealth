@@ -24,6 +24,14 @@ namespace MageritHealth.Repositories
                 return null;
             }
 
+            if (user.Pass != password)
+            {
+                return null;
+            } else
+            {
+                return user;
+            }
+
             //Credencial credencial = await this.context.Credenciales.FirstOrDefaultAsync(c => c.IdUsuario == user.IdUsuario);
 
             //if (credencial == null)
@@ -42,15 +50,6 @@ namespace MageritHealth.Repositories
             //    return null;
             //}
 
-            // TEMPORAL
-            if (user.Pass == password)
-            {
-                return user;
-            }
-            else
-            {
-                return null;
-            }
         }
 
         public async Task<Usuario> GetUsuarioByIdAsync(int id)

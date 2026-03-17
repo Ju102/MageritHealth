@@ -68,7 +68,11 @@ namespace MageritHealth.Repositories
 
         public async Task<Cita> GetCitaByIdAsync(int idCita)
         {
-            return await this.context.Citas.FirstOrDefaultAsync(c => c.IdCita == idCita);
+            return await this.context.Citas
+                .Include(c => c.Doctor) // Carga el doctor
+                    .ThenInclude(d => d.Especialidad) // Carga la especialidad del doctor
+                .Include(c => c.Paciente) // Por si acaso también lo necesitas
+                .FirstOrDefaultAsync(c => c.IdCita == idCita);
         }
 
         public async Task<List<Cita>> GetAllCitas()
@@ -100,6 +104,16 @@ namespace MageritHealth.Repositories
         {
             return await this.context.Citas.Include(c => c.Doctor)
                 .ThenInclude(d => d.Especialidad).Where(c => c.IdPaciente == idPaciente).ToListAsync();
+        }
+
+        public async Task<Cita> GetUltimaCitaAsync(int idPaciente)
+        {
+            return await this.context.Citas
+                .Include(c => c.Doctor)
+                    .ThenInclude(d => d.Especialidad)
+                .Where(c => c.IdPaciente == idPaciente && c.Estado == "completada")
+                .OrderByDescending(c => c.FechaHora)
+                .FirstOrDefaultAsync();
         }
     }
 }

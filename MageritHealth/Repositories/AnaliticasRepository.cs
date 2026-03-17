@@ -50,6 +50,7 @@ namespace MageritHealth.Repositories
         {
             return await this.context.Mediciones
                 .Include(m => m.TipoMedicion)
+                .Include(m => m.Analitica)
                 .Where(m => m.IdAnalitica == idAnalitica)
                 .ToListAsync();
         }

@@ -5,7 +5,6 @@
     Layout = "_PacienteLayout";
     ViewData["Title"] = "Mis Citas Médicas";
 
-    // Filtramos las citas para mejorar la experiencia de usuario
     var citasProximas = Model.Where(c => c.Estado.ToLower() == "programada")
                              .OrderBy(c => c.FechaHora).ToList();
 
@@ -17,10 +16,10 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h3 class="fw-bold text-dark mb-0">Mis Citas Médicas</h3>
-            <p class="text-muted small">Gestiona tus próximas visitas y consulta tu historial clínico.</p>
+            <p class="text-muted small">Gestiona tus consultas y revisa diagnósticos pasados.</p>
         </div>
-        <a asp-controller="Paciente" asp-action="SolicitarCita" class="btn btn-primary btn-lg rounded-3 fw-bold shadow-sm" style="background-color: #0ea5e9; border-color: #0ea5e9;">
-            <i class="bi bi-calendar-plus me-2"></i>Nueva Cita
+        <a asp-controller="Paciente" asp-action="SolicitarCita" class="btn btn-outline-primary btn-lg rounded-3 fw-bold shadow-sm d-none d-md-inline-block">
+            <i class="bi bi-calendar-plus me-2"></i>Solicitar Cita
         </a>
     </div>
 
@@ -32,33 +31,36 @@
 
             @if (citasProximas.Any())
             {
-                <div class="row g-3">
+                <div class="row g-4">
                     @foreach (var cita in citasProximas)
                     {
-                        <div class="col-md-6 col-lg-4">
-                            <div class="patient-card p-4 border-start border-info border-5 shadow-sm h-100 position-relative">
+                        <div class="col-lg-6">
+                            <div class="patient-card p-4 h-100 border-start border-info border-5 shadow-sm position-relative d-flex flex-column">
                                 <div class="position-absolute top-0 end-0 p-3">
-                                    <button class="btn btn-sm btn-outline-danger border-0" title="Cancelar Cita">
-                                        <i class="bi bi-x-circle fs-5"></i>
-                                    </button>
+                                    <span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill small">Programada</span>
                                 </div>
 
-                                <div class="d-flex align-items-center mb-3">
-                                    <div class="p-3 bg-info bg-opacity-10 text-info rounded-3 text-center me-3">
-                                        <div class="fs-4 fw-bold lh-1">@cita.FechaHora.ToString("dd")</div>
-                                        <div class="small fw-semibold text-uppercase">@cita.FechaHora.ToString("MMM")</div>
-                                        <div class="small fw-semibold text-uppercase">@cita.FechaHora.ToString("yyyy")</div>
+                                <div class="d-flex align-items-center mb-3 mt-4 mt-sm-0">
+                                    <div class="me-3 text-center border-end pe-3">
+                                        <h2 class="fw-bold text-info mb-0">@cita.FechaHora.ToString("dd")</h2>
+                                        <span class="text-muted small text-uppercase fw-bold">@cita.FechaHora.ToString("MMM")</span>
                                     </div>
                                     <div>
-                                        <h6 class="fw-bold mb-1 text-dark">@cita.FechaHora.ToString("HH:mm") h</h6>
-                                        <span class="badge bg-warning text-dark bg-opacity-25 border border-warning rounded-pill">Programada</span>
+                                        <h5 class="fw-bold text-dark mb-1 text-truncate" style="max-width: 200px;" title="@cita.Motivo">@cita.Motivo</h5>
+                                        <small class="text-muted fw-bold"><i class="bi bi-clock me-1"></i> @cita.FechaHora.ToString("HH:mm") h</small>
                                     </div>
                                 </div>
 
-                                <h6 class="fw-bold text-dark text-truncate" title="@cita.Motivo">@cita.Motivo</h6>
-                                <p class="text-muted small mb-0">
-                                    <i class="bi bi-person-badge me-2"></i>Dr./a. @cita.Doctor.Nombre @cita.Doctor.Apellido1
-                                </p>
+                                <div class="bg-light p-3 rounded-3 border mb-4 flex-grow-1">
+                                    <p class="mb-0 fw-bold text-dark"><i class="bi bi-person-badge text-primary me-2"></i>Especialista:</p>
+                                    <p class="mb-1 text-muted ms-4">Dr./a. @cita.Doctor.Nombre @cita.Doctor.Apellido1</p>
+                                </div>
+
+                                <div class="text-end mt-auto">
+                                    <a asp-controller="Paciente" asp-action="DetallesCita" asp-route-idcita="@cita.IdCita" class="btn btn-sm btn-light text-primary fw-bold shadow-sm">
+                                        <i class="bi bi-file-earmark-medical me-1"></i>Informe
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     }
@@ -66,17 +68,17 @@
             }
             else
             {
-                <div class="patient-card p-4 text-center bg-light border-0 shadow-sm">
-                    <i class="bi bi-calendar-check text-muted fs-1 mb-2 d-block opacity-50"></i>
-                    <h6 class="fw-bold text-secondary">No tienes citas próximas</h6>
-                    <p class="text-muted small mb-0">Tus próximas visitas médicas aparecerán aquí.</p>
+                <div class="patient-card p-5 border-start border-secondary border-5 shadow-sm text-center bg-light bg-opacity-50">
+                    <i class="bi bi-calendar-x fs-1 text-muted opacity-50 mb-2 d-block"></i>
+                    <h6 class="fw-bold text-secondary mb-1">Agenda libre</h6>
+                    <p class="text-muted small mb-0">No tienes visitas programadas próximamente.</p>
                 </div>
             }
         </div>
 
         <div class="col-12 mt-5">
             <h5 class="fw-bold text-dark mb-3">
-                <i class="bi bi-clock-history text-secondary me-2"></i>Historial de Consultas
+                <i class="bi bi-clock-history text-secondary me-2"></i>Historial Clínico
             </h5>
 
             <div class="patient-card shadow-sm overflow-hidden border-0">
@@ -90,47 +92,46 @@
                                     <th>ESPECIALISTA</th>
                                     <th>MOTIVO</th>
                                     <th>ESTADO</th>
-                                    <th class="text-end pe-4">INFORME</th>
+                                    <th class="text-end pe-4">ACCIÓN</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var cita in historialCitas)
                                 {
                                     <tr>
-                                        <td class="ps-4 fw-semibold text-dark">
-                                            @cita.FechaHora.ToString("dd MMM yyyy - HH:mm")
+                                        <td class="ps-4 py-3">
+                                            <div class="fw-bold text-dark">@cita.FechaHora.ToString("dd MMM yyyy")</div>
+                                            <div class="small text-muted">@cita.FechaHora.ToString("HH:mm") h</div>
                                         </td>
-                                        <td>
-                                            <div class="fw-bold text-dark">Dr./a. @cita.Doctor.Nombre @cita.Doctor.Apellido1</div>
+                                        <td class="py-3">
+                                            <div class="fw-bold text-dark">Dr./a. @cita.Doctor.Apellido1</div>
                                             <div class="small text-muted">@cita.Doctor.Especialidad?.NombreEspecialidad</div>
                                         </td>
-                                        <td class="text-truncate" style="max-width: 200px;" title="@cita.Motivo">
-                                            @cita.Motivo
+                                        <td class="py-3">
+                                            <span class="text-secondary text-truncate d-inline-block" style="max-width: 200px;" title="@cita.Motivo">
+                                                @cita.Motivo
+                                            </span>
                                         </td>
-                                        <td>
+                                        <td class="py-3">
                                             @if (cita.Estado.ToLower() == "completada")
                                             {
-                                                <span class="badge bg-success bg-opacity-10 text-success border border-success">Completada</span>
+                                                <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill small">Completada</span>
                                             }
                                             else if (cita.Estado.ToLower() == "cancelada")
                                             {
-                                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Cancelada</span>
+                                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill small">Cancelada</span>
                                             }
                                             else
                                             {
-                                                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary">@cita.Estado</span>
+                                                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary rounded-pill small">@cita.Estado</span>
                                             }
                                         </td>
-                                        <td class="text-end pe-4">
+                                        <td class="text-end pe-4 py-3">
                                             @if (cita.Estado.ToLower() == "completada")
                                             {
-                                                <button class="btn btn-sm btn-outline-primary" title="Ver Detalles">
-                                                    <i class="bi bi-file-earmark-medical"></i>
-                                                </button>
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted small">-</span>
+                                                <a asp-controller="Paciente" asp-action="DetallesCita" asp-route-idcita="@cita.IdCita" class="btn btn-sm btn-light text-primary fw-bold shadow-sm">
+                                                    <i class="bi bi-file-earmark-medical me-1"></i>Informe
+                                                </a>
                                             }
                                         </td>
                                     </tr>
@@ -141,9 +142,9 @@
                 }
                 else
                 {
-                    <div class="p-5 text-center text-muted">
-                        <i class="bi bi-folder2-open fs-1 opacity-50 d-block mb-2"></i>
-                        Aún no tienes historial médico registrado.
+                    <div class="p-5 text-center bg-light bg-opacity-50">
+                        <i class="bi bi-archive fs-1 text-muted opacity-50 mb-3 d-block"></i>
+                        <p class="text-muted small mb-0">Aún no tienes historial médico registrado en el sistema.</p>
                     </div>
                 }
             </div>

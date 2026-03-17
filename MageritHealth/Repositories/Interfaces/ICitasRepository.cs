@@ -19,5 +19,6 @@ namespace MageritHealth.Repositories.Interfaces
         Task DeleteLogicoCitaAsync(int idCita);
         Task<Cita> GetProximaCitaAsync(int idPaciente);
         Task<List<Cita>> GetHistorialCitasPacienteAsync(int idPaciente, int limit);
+        Task<Cita> GetUltimaCitaAsync(int idPaciente);
     }
 }

@@ -1,0 +1,202 @@
+﻿@using MageritHealth.ViewModels
+@model MiSaludVitalViewModel
+
+@{
+    Layout = "_PacienteLayout";
+    ViewData["Title"] = "Mi Salud Vital";
+}
+
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-0">Mi Salud Vital</h3>
+            <p class="text-muted small">Haz seguimiento de tus constantes y revisa tus resultados de laboratorio.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <h5 class="fw-bold text-dark mb-3">
+                <i class="bi bi-activity text-danger me-2"></i>Últimas Mediciones
+            </h5>
+
+            @if (Model.Mediciones.Any())
+            {
+                @foreach (var med in Model.Mediciones)
+                {
+                    <div class="patient-card p-4 mb-4 border-start border-@med.ColorClass border-5 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="fw-bold text-dark mb-0">@med.Nombre</h6>
+                                <small class="text-muted">Última medición: @med.Fecha.ToString("dd MMM yyyy")</small>
+                            </div>
+                            <div class="text-end">
+                                <h3 class="fw-bold text-@med.ColorClass mb-0">@med.Valor <span class="fs-6 text-muted fw-normal">@med.Unidad</span></h3>
+                                <span class="badge bg-@med.ColorClass bg-opacity-10 text-@med.ColorClass border border-@med.ColorClass rounded-pill small">@med.EstadoRango</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <div class="d-flex justify-content-between text-muted small mb-1 fw-bold">
+                                <span>Min: @med.Minimo</span>
+                                <span>Max: @med.Maximo</span>
+                            </div>
+                            <div class="progress" style="height: 10px; overflow: visible;">
+                                <div class="progress-bar bg-@med.ColorClass rounded-pill" role="progressbar" style="width: @med.PorcentajeBarra%" aria-valuenow="@med.Valor" aria-valuemin="@med.Minimo" aria-valuemax="@med.Maximo"></div>
+                            </div>
+
+                            @if (med.EstadoRango == "Alto")
+                            {
+                                <small class="text-danger d-block mt-2"><i class="bi bi-exclamation-triangle-fill me-1"></i> El valor supera el límite recomendado de @med.Maximo @med.Unidad.</small>
+                            }
+                            else if (med.EstadoRango == "Bajo")
+                            {
+                                <small class="text-warning text-dark d-block mt-2"><i class="bi bi-exclamation-triangle-fill me-1"></i> El valor está por debajo del mínimo de @med.Minimo @med.Unidad.</small>
+                            }
+                        </div>
+
+                        <div class="mt-3 text-end">
+                            <a href="#" class="btn btn-sm btn-light text-primary fw-bold"><i class="bi bi-graph-up me-2"></i>Ver gráfica histórica</a>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="p-4 text-center bg-light rounded-3 text-muted">
+                    No hay mediciones registradas.
+                </div>
+            }
+        </div>
+
+        <div class="col-lg-5">
+            <h5 class="fw-bold text-dark mb-3">
+                <i class="bi bi-droplet-half text-primary me-2"></i>Mis Analíticas
+            </h5>
+
+            <div class="patient-card shadow-sm overflow-hidden border-0">
+                <div class="list-group list-group-flush">
+                    @if (Model.Analiticas.Any())
+                    {
+                        @foreach (var analitica in Model.Analiticas.OrderByDescending(a => a.FechaAnalitica))
+                        {
+                            bool esCompletada = analitica.Estado.ToLower() == "completada";
+                            string badgeClass = esCompletada ? "bg-success text-success border-success" : "bg-warning text-dark border-warning bg-opacity-25";
+                            string containerClass = esCompletada ? "" : "bg-light";
+
+                            <div class="list-group-item p-4 border-bottom @containerClass">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge @badgeClass bg-opacity-10 border rounded-pill text-capitalize">@analitica.Estado</span>
+                                    <small class="text-muted fw-bold">@analitica.FechaAnalitica.ToString("dd MMM yyyy")</small>
+                                </div>
+
+                                <h6 class="fw-bold text-dark mb-1">
+                                    @(analitica.Notas != null && analitica.Notas.Length > 30 ? analitica.Notas.Substring(0, 30) + "..." : analitica.Cita?.Motivo ?? "Analítica")
+                                </h6>
+
+                                <p class="text-muted small mb-3">
+                                    <i class="bi bi-person-badge me-1"></i> Solicitada por Dr/a. @(analitica.Cita?.Doctor?.Apellido1 ?? "N/A")
+                                </p>
+
+                                @if (esCompletada)
+                                {
+                                    <a asp-controller="Paciente" asp-action="ResultadosAnalitica" asp-route-id="@analitica.IdAnalitica" class="btn btn-outline-primary btn-sm w-100 fw-bold">
+                                        <i class="bi bi-file-earmark-medical me-2"></i>Ver Resultados Detallados
+                                    </a>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-warning py-2 px-3 small mb-0 border-warning border-opacity-25">
+                                        <i class="bi bi-info-circle-fill me-1"></i> @(analitica.Notas ?? "Recuerda acudir a tu cita.")
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="p-4 text-center text-muted">
+                            Aún no tienes analíticas solicitadas.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <h5 class="fw-bold text-dark mb-3 mt-5">
+                <i class="bi bi-journal-medical text-info me-2"></i>Antecedentes Médicos
+            </h5>
+
+            <div class="patient-card shadow-sm overflow-hidden border-0 mb-4">
+                @if (Model.AntecedentesMedicos.Any() == true)
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light small text-muted">
+                                <tr>
+                                    <th class="ps-4">DIAGNÓSTICO</th>
+                                    <th>FECHA</th>
+                                    <th class="text-end pe-4">SEVERIDAD</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var ant in Model.AntecedentesMedicos.Where(a => a.Activo))
+                                {
+                                    <tr>
+                                        <td class="ps-4 py-3">
+                                            <div class="fw-bold text-dark">@ant.Nombre</div>
+                                            <div class="small text-muted">@ant.Tipo - @ant.Notas</div>
+                                        </td>
+
+                                        <td class="text-muted small">
+                                            @(ant.FechaDiagnostico != null
+                                                                                ? ant.FechaDiagnostico.Value.ToString("MMM yyyy")
+                                                                                : "Desconocida")
+                                        </td>
+
+                                        <td class="text-end pe-4">
+                                            @if (ant.Severidad?.ToLower() == "grave" || ant.Severidad?.ToLower() == "critica")
+                                            {
+                                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill">
+                                                    @ant.Severidad.ToUpper()
+                                                </span>
+                                            }
+                                            else if (ant.Severidad?.ToLower() == "moderada")
+                                            {
+                                                <span class="badge bg-warning bg-opacity-10 text-warning border border-warning rounded-pill">
+                                                    @ant.Severidad.ToUpper()
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill">
+                                                    @(ant.Severidad?.ToUpper() ?? "N/A")
+                                                </span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-4 text-center bg-light">
+                        <p class="text-muted small mb-0">
+                            <i class="bi bi-clipboard-x me-1"></i> No hay antecedentes registrados en tu ficha.
+                        </p>
+                    </div>
+                }
+            </div>
+
+            <div class="mt-4 p-3 bg-primary bg-opacity-10 rounded-4 border border-primary border-opacity-25 d-flex align-items-center">
+                <div class="p-2 text-primary me-2">
+                    <i class="bi bi-shield-lock fs-3"></i>
+                </div>
+                <p class="mb-0 small text-dark">
+                    Tus datos clínicos están protegidos y solo son accesibles por ti y tu equipo médico asignado.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

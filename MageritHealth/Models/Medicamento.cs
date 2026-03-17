@@ -18,7 +18,7 @@ namespace MageritHealth.Models
 
         public string Formato { get; set; }
 
-        public string Fabricante { get; set; }
+        public string? Fabricante { get; set; }
 
         public bool Activo { get; set; }
 

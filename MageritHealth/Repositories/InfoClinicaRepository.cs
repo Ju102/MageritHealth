@@ -62,7 +62,6 @@ namespace MageritHealth.Repositories
                 IdInfoClinica = maxId + 1,
                 IdPaciente = idPaciente,
                 GrupoSanguineo = grupo,
-                PesoNacimiento = pesoNac,
                 ContactoEmergenciaNombre = nombreContacto,
                 ContactoEmergenciaTelefono = telefContacto,
             };
@@ -93,7 +92,6 @@ namespace MageritHealth.Repositories
             if (infoClinicaPaciente != null)
             {
                 infoClinicaPaciente.GrupoSanguineo = grupo;
-                infoClinicaPaciente.PesoNacimiento = pesoNac;
                 infoClinicaPaciente.ContactoEmergenciaNombre = nombreContacto;
                 infoClinicaPaciente.ContactoEmergenciaTelefono = telefContacto;
 

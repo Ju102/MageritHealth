@@ -2,8 +2,10 @@
 using MageritHealth.Models;
 using MageritHealth.Models.ViewModels;
 using MageritHealth.Repositories.Interfaces;
+using MageritHealth.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -39,14 +41,24 @@ namespace MageritHealth.Controllers
             InfoClinicaPaciente info = await this.infoClinicaRepository.GetInfoClinicaPacienteByIdPacienteAsync(idUsuarioLogueado);
             List<AntecedenteMedico> antecedentes = await this.infoClinicaRepository.GetListaAntecedentesMedicosByIdPacienteAsync(idUsuarioLogueado);
 
-            PerfilVital perfil = new PerfilVital()
+            PerfilVital perfil = new PerfilVital();
+
+            if (info != null)
             {
-                NombreContacto = info.ContactoEmergenciaNombre,
-                TelefonoContacto = info.ContactoEmergenciaTelefono,
-                Peso = info.PesoActual,
-                TipoSangre = info.GrupoSanguineo,
-                Altura = 100
-            };
+                perfil.NombreContacto = info.ContactoEmergenciaNombre ?? "Sin asignar";
+                perfil.TelefonoContacto = info.ContactoEmergenciaTelefono ?? "--";
+                perfil.Peso = info.PesoActual ?? 0;
+                perfil.TipoSangre = info.GrupoSanguineo ?? "Desconocido";
+                perfil.Altura = 100;
+            }
+            else
+            {
+                perfil.NombreContacto = "Sin asignar";
+                perfil.TelefonoContacto = "--";
+                perfil.Peso = 0;
+                perfil.TipoSangre = "Desconocido";
+                perfil.Altura = 0;
+            }
 
             PacienteDashboardViewModel viewmodel = new PacienteDashboardViewModel()
             {
@@ -82,7 +94,7 @@ namespace MageritHealth.Controllers
             var doctoresFiltrados = doctores.Select(d => new
             {
                 value = d.IdUsuario,
-                text = $"Dr/a. {d.Nombre} {d.Apellido1}"
+                text = $"Dr/a. {d.Nombre} {d.Apellido1} {d.Apellido2}"
             });
 
             return Json(doctoresFiltrados);
@@ -181,6 +193,80 @@ namespace MageritHealth.Controllers
             int idUsuario = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
             List<Cita> citas = await this.citasRepository.GetAllCitasByIdPaciente(idUsuario);
             return View(citas);
+        }
+
+        public async Task<IActionResult> Salud()
+        {
+            MiSaludVitalViewModel viewModel = new MiSaludVitalViewModel();
+
+            int idUsuario = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            viewModel.Analiticas = await this.analiticasRepository.GetListaAnaliticasByIdUsuarioAsync(idUsuario);
+            viewModel.Mediciones = new List<MedicionResumen>();
+            int idUltimaAnalitica = viewModel.Analiticas.OrderByDescending(a => a.FechaAnalitica).FirstOrDefault()?.IdAnalitica ?? 0;
+            List<Medicion> mediciones = await this.analiticasRepository.GetListaMedicionesByIdAnaliticaAsync(idUltimaAnalitica);
+            List<AntecedenteMedico> antecedentes = await this.infoClinicaRepository.GetListaAntecedentesMedicosByIdPacienteAsync(idUsuario);
+            antecedentes = antecedentes.Where(a => a.Tipo.ToLower() != "alergia").ToList();
+            foreach (Medicion medicion in mediciones)
+            {
+                MedicionResumen resumen = new MedicionResumen();
+                resumen.Nombre = medicion.TipoMedicion.NombreMedicion;
+                resumen.Unidad = medicion.TipoMedicion.UnidadMedicion;
+                resumen.Valor = medicion.ValorMedicion;
+                resumen.Minimo = medicion.TipoMedicion.ValorMinimo;
+                resumen.Maximo = medicion.TipoMedicion.ValorMaximo;
+                resumen.Fecha = medicion.Analitica.FechaAnalitica;
+                viewModel.Mediciones.Add(resumen);
+            }
+            
+            viewModel.AntecedentesMedicos = antecedentes;
+
+            return View(viewModel);
+
+        }
+
+        public async Task<IActionResult> Tratamientos()
+        {
+            // 1. Obtener el ID del paciente logueado
+            int idUsuarioLogueado = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            List<Prescripcion> todasPrescripciones = await this.prescripcionesRepository.GetListaPrescripcionesByIdPacienteAsync(idUsuarioLogueado);
+
+            List<AntecedenteMedico> antecedentes = await this.infoClinicaRepository.GetListaAntecedentesMedicosByIdPacienteAsync(idUsuarioLogueado);
+
+            TratamientosViewModel viewmodel = new TratamientosViewModel()
+            {
+                // Medicación activa: La fecha de fin es mayor a hoy, o es null (tratamiento crónico)
+                MedicacionActiva = todasPrescripciones
+                    .Where(p => p.Activa == true)
+                    .OrderByDescending(p => p.FechaInicio)
+                    .ToList(),
+
+                // Historial: La fecha de fin ya pasó
+                HistorialMedicacion = todasPrescripciones
+                    .Where(p => p.Activa == false)
+                    .OrderByDescending(p => p.FechaFin) // Los más recientes primero
+                    .ToList(),
+
+                // Alergias: Filtramos los antecedentes donde el Tipo sea 'alergia'
+                Alergias = antecedentes
+                    .Where(a => a.Tipo.ToLower() == "alergia")
+                    .ToList()
+            };
+
+            return View(viewmodel);
+        }
+
+        public async Task<IActionResult> DetallesCita(int idcita)
+        {
+            Cita cita = await this.citasRepository.GetCitaByIdAsync(idcita);
+            return View(cita);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CancelarCita(int idcita)
+        {
+            await this.citasRepository.DeleteLogicoCitaAsync(idcita);
+            return RedirectToAction("Citas");
         }
     }
 }

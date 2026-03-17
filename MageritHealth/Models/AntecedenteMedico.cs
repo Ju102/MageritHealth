@@ -16,9 +16,9 @@ namespace MageritHealth.Models
 
         public string Nombre { get; set; }
 
-        public string Severidad { get; set; }
+        public string? Severidad { get; set; }
 
-        public DateTime FechaDiagnostico { get; set; }
+        public DateTime? FechaDiagnostico { get; set; }
         public string? Notas { get; set; }
 
         public bool Activo { get; set; }

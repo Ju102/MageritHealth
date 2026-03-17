@@ -14,9 +14,7 @@ namespace MageritHealth.Models
 
         public string GrupoSanguineo { get; set; }
 
-        public decimal PesoActual { get; set; }
-
-        public decimal PesoNacimiento { get; set; }
+        public decimal? PesoActual { get; set; }
 
         public string ContactoEmergenciaNombre { get; set; }
 
