@@ -1,0 +1,95 @@
+﻿@using MageritHealth.Models
+@model Usuario
+
+@{
+    Layout = "_DoctorLayout";
+    ViewData["Title"] = "Mi Perfil";
+}
+
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-0">Mi Perfil</h3>
+            <p class="text-muted small">Consulta tu información personal y antecedentes médicos.</p>
+        </div>
+        <a asp-controller="Doctor" asp-action="EditarPerfil" class="btn btn-outline-primary btn-lg rounded-3 fw-bold shadow-sm">
+            <i class="bi bi-pencil-square me-2"></i>Editar Datos
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <h5 class="fw-bold text-dark mb-3">
+                <i class="bi bi-person-badge text-primary me-2"></i>Datos Personales
+            </h5>
+
+            <div class="patient-card p-4 mb-4 border-start border-primary border-5 shadow-sm text-center">
+                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex justify-content-center align-items-center mb-3 text-primary" style="width: 80px; height: 80px;">
+                    <i class="bi bi-person-fill fs-1"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-1">@Model.Nombre @Model.Apellido1</h5>
+                <p class="text-muted small mb-3">DNI: @Model.Dni</p>
+
+                @if (Model.Activo)
+                {
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-3 py-2 mb-4"><i class="bi bi-check-circle me-1"></i>Activo</span>
+                }
+                else
+                {
+                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill px-3 py-2 mb-4"><i class="bi bi-x-circle me-1"></i> Inactivo</span>
+                }
+
+                <div class="text-start border-top pt-3">
+                    <div class="mb-3">
+                        <small class="text-muted fw-bold d-block text-uppercase mb-1">Contacto</small>
+                        <div class="text-dark small"><i class="bi bi-telephone text-primary me-2"></i>@Model.Telefono</div>
+                        <div class="text-dark small mt-1"><i class="bi bi-envelope text-primary me-2"></i>@Model.Email</div>
+                    </div>
+                    <div>
+                        <small class="text-muted fw-bold d-block text-uppercase mb-1">Dirección</small>
+                        <div class="text-dark small"><i class="bi bi-geo-alt text-primary me-2"></i>@Model.Direccion</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center text-muted small">
+                <i class="bi bi-shield-lock me-1"></i> Registrado el @Model.FechaCreacion.ToString("dd/MM/yyyy")
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <h5 class="fw-bold text-dark mb-3">
+                <i class="bi bi-clipboard2-pulse text-success me-2"></i>Datos Clínicos
+            </h5>
+
+            <div class="patient-card p-4 mb-4 border-start border-success border-5 shadow-sm">
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-3">
+                        <div class="bg-light p-3 rounded-3 border">
+                            <small class="text-muted fw-bold d-block mb-1">Fecha Nacimiento</small>
+                            <span class="fw-bold text-dark">@Model.FechaNacimiento.ToString("dd/MMM/yyyy")</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="bg-light p-3 rounded-3 border">
+                            <small class="text-muted fw-bold d-block mb-1">Género</small>
+                            <span class="fw-bold text-dark text-capitalize">@Model.Genero</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="bg-light p-3 rounded-3 border">
+                            <small class="text-muted fw-bold d-block mb-1">Nº Colegiado</small>
+                            <span class="fw-bold text-dark">@(Model.NumeroColegiado ?? "Sin asignar")</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="bg-light p-3 rounded-3 border">
+                            <small class="text-muted fw-bold d-block mb-1">Especialidad</small>
+                            <span class="fw-bold text-dark">@Model.Especialidad.NombreEspecialidad</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

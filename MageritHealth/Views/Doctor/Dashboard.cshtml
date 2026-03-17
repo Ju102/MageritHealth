@@ -3,181 +3,209 @@
     ViewData["Title"] = "Panel Médico";
 }
 
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="fw-bold text-dark mb-0">Bienvenido/a, Dr. @Context.User.Identity.Name</h3>
-            <p class="text-muted">Especialidad: <span class="badge bg-info text-dark">Cardiología</span> | Colegiado: COL-28001</p>
+<div class="container mb-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div class="mb-3 mb-md-0">
+            <h3 class="fw-bold text-dark mb-1">Bienvenido/a, Dr/a. @Context.User.Identity.Name</h3>
+            <p class="text-muted small mb-0">
+                <span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill me-2">Cardiología</span>
+                <i class="bi bi-person-badge text-secondary me-1"></i>Colegiado: @Context.User.FindFirst("LicenseNumber").Value
+            </p>
         </div>
         <div class="d-flex gap-2">
-            <div class="input-group">
-                <input type="text" class="form-control" placeholder="Buscar paciente por DNI...">
-                <button class="btn btn-primary"><i class="bi bi-search"></i></button>
+            <div class="input-group shadow-sm rounded-3">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control border-start-0 ps-0" placeholder="Buscar paciente por DNI o Nombre...">
+                <button class="btn btn-primary fw-bold px-3">Buscar</button>
             </div>
         </div>
     </div>
 
-    <div class="row g-4 mb-4">
-        <div class="col-md-3">
-            <div class="doctor-stat-card shadow-sm border-start border-primary border-4">
-                <h6 class="text-muted small fw-bold">CITAS HOY</h6>
-                <div class="d-flex align-items-center">
-                    <span class="fs-2 fw-bold">8</span>
-                    <span class="ms-auto p-2 bg-primary bg-opacity-10 text-primary rounded"><i class="bi bi-calendar-check fs-4"></i></span>
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-xl-3">
+            <div class="doctor-card doctor-stat-card p-4 border-start border-primary border-5 shadow-sm h-100">
+                <h6 class="text-muted small fw-bold text-uppercase mb-3">Citas Hoy</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                    <span class="display-5 fw-bold text-dark lh-1">8</span>
+                    <div class="p-3 bg-primary bg-opacity-10 text-primary rounded-circle">
+                        <i class="bi bi-calendar-check fs-4"></i>
+                    </div>
                 </div>
-                <p class="small text-success mb-0 mt-2"><i class="bi bi-clock"></i> Siguiente: 10:30 AM</p>
+                <p class="small text-primary fw-bold mb-0 mt-3"><i class="bi bi-clock me-1"></i> Siguiente: 10:30 AM</p>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="doctor-stat-card shadow-sm border-start border-info border-4">
-                <h6 class="text-muted small fw-bold">PACIENTES ASIGNADOS</h6>
-                <div class="d-flex align-items-center">
-                    <span class="fs-2 fw-bold">142</span>
-                    <span class="ms-auto p-2 bg-info bg-opacity-10 text-info rounded"><i class="bi bi-person-heart fs-4"></i></span>
+        <div class="col-md-6 col-xl-3">
+            <div class="doctor-card doctor-stat-card p-4 border-start border-info border-5 shadow-sm h-100">
+                <h6 class="text-muted small fw-bold text-uppercase mb-3">Pacientes Asignados</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                    <span class="display-5 fw-bold text-dark lh-1">142</span>
+                    <div class="p-3 bg-info bg-opacity-10 text-info rounded-circle">
+                        <i class="bi bi-person-heart fs-4"></i>
+                    </div>
                 </div>
-                <p class="small text-muted mb-0 mt-2">+3 nuevas asignaciones este mes</p>
+                <p class="small text-muted mb-0 mt-3"><i class="bi bi-graph-up text-success me-1"></i> +3 este mes</p>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="doctor-stat-card shadow-sm border-start border-warning border-4">
-                <h6 class="text-muted small fw-bold">ANALÍTICAS PENDIENTES</h6>
-                <div class="d-flex align-items-center">
-                    <span class="fs-2 fw-bold">5</span>
-                    <span class="ms-auto p-2 bg-warning bg-opacity-10 text-warning rounded"><i class="bi bi-clipboard2-pulse fs-4"></i></span>
+        <div class="col-md-6 col-xl-3">
+            <div class="doctor-card doctor-stat-card p-4 border-start border-warning border-5 shadow-sm h-100">
+                <h6 class="text-muted small fw-bold text-uppercase mb-3">Analíticas Ptes.</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                    <span class="display-5 fw-bold text-dark lh-1">5</span>
+                    <div class="p-3 bg-warning bg-opacity-10 text-warning rounded-circle">
+                        <i class="bi bi-clipboard2-pulse fs-4"></i>
+                    </div>
                 </div>
-                <p class="small text-danger mb-0 mt-2">2 requieren revisión urgente</p>
+                <p class="small text-danger fw-bold mb-0 mt-3"><i class="bi bi-exclamation-circle me-1"></i> 2 requieren revisión urgente</p>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="doctor-stat-card shadow-sm border-start border-success border-4">
-                <h6 class="text-muted small fw-bold">PRESCRIPCIONES</h6>
-                <div class="d-flex align-items-center">
-                    <span class="fs-2 fw-bold">12</span>
-                    <span class="ms-auto p-2 bg-success bg-opacity-10 text-success rounded"><i class="bi bi-prescription2 fs-4"></i></span>
+        <div class="col-md-6 col-xl-3">
+            <div class="doctor-card doctor-stat-card p-4 border-start border-success border-5 shadow-sm h-100">
+                <h6 class="text-muted small fw-bold text-uppercase mb-3">Prescripciones</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                    <span class="display-5 fw-bold text-dark lh-1">12</span>
+                    <div class="p-3 bg-success bg-opacity-10 text-success rounded-circle">
+                        <i class="bi bi-prescription2 fs-4"></i>
+                    </div>
                 </div>
-                <p class="small text-muted mb-0 mt-2">Emitidas en las últimas 24h</p>
+                <p class="small text-muted mb-0 mt-3">Emitidas en las últimas 24h</p>
             </div>
         </div>
     </div>
 
     <div class="row g-4">
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-white py-3">
-                    <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-clock-history me-2"></i>Agenda de Hoy - @DateTime.Now.ToString("dd MMM yyyy")</h6>
+            <h5 class="fw-bold text-dark mb-3">
+                <i class="bi bi-calendar-day text-primary me-2"></i>Agenda de Hoy <span class="text-muted fs-6 fw-normal">- @DateTime.Now.ToString("dd MMM yyyy")</span>
+            </h5>
+
+            <div class="doctor-card shadow-sm overflow-hidden border-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light small text-muted text-uppercase">
+                            <tr>
+                                <th class="ps-4 py-3">Hora</th>
+                                <th class="py-3">Paciente</th>
+                                <th class="py-3">Motivo</th>
+                                <th class="py-3">Estado</th>
+                                <th class="text-end pe-4 py-3">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-bottom">
+                                <td class="ps-4 py-3 text-muted fw-bold">10:00</td>
+                                <td class="py-3">
+                                    <div class="fw-bold text-dark">Mario García Pérez</div>
+                                    <span class="small text-muted">DNI: 55555555E</span>
+                                </td>
+                                <td class="py-3 text-secondary">Revisión Anual</td>
+                                <td class="py-3">
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill small">Completada</span>
+                                </td>
+                                <td class="text-end pe-4 py-3">
+                                    <button class="btn btn-sm btn-light text-primary rounded-circle" title="Ver Informe"><i class="bi bi-file-earmark-medical"></i></button>
+                                </td>
+                            </tr>
+                            <tr class="bg-primary bg-opacity-10 border-start border-primary border-4">
+                                <td class="ps-4 py-3 text-primary fw-bold">10:30</td>
+                                <td class="py-3">
+                                    <div class="fw-bold text-dark">Lucía Jiménez Soto</div>
+                                    <span class="small text-muted">DNI: 66666666F</span>
+                                </td>
+                                <td class="py-3 text-secondary">Control de Marcapasos</td>
+                                <td class="py-3">
+                                    <span class="badge bg-primary text-white rounded-pill small">Siguiente</span>
+                                </td>
+                                <td class="text-end pe-4 py-3">
+                                    <a asp-controller="Doctor" asp-action="Consulta" class="btn btn-sm btn-primary fw-bold shadow-sm">Iniciar Consulta</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4 py-3 text-dark fw-bold">11:00</td>
+                                <td class="py-3">
+                                    <div class="fw-bold text-dark">Mario García Ramos</div>
+                                    <span class="small text-muted">DNI: 77777777G</span>
+                                </td>
+                                <td class="py-3 text-secondary">Consulta General</td>
+                                <td class="py-3">
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary rounded-pill small">Programada</span>
+                                </td>
+                                <td class="text-end pe-4 py-3">
+                                    <button class="btn btn-sm btn-light text-secondary rounded-circle" title="Ver Ficha"><i class="bi bi-eye"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="bg-light">
-                                <tr class="small text-muted">
-                                    <th class="ps-4">HORA</th>
-                                    <th>PACIENTE</th>
-                                    <th>MOTIVO</th>
-                                    <th>ESTADO</th>
-                                    <th class="text-end pe-4">ACCIÓN</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="ps-4 fw-bold">10:00</td>
-                                    <td>
-                                        <div class="fw-bold">Mario García Pérez</div>
-                                        <span class="small text-muted">DNI: 55555555E</span>
-                                    </td>
-                                    <td>Revisión Anual</td>
-                                    <td><span class="badge rounded-pill bg-success">Completada</span></td>
-                                    <td class="text-end pe-4">
-                                        <button class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-medical"></i></button>
-                                    </td>
-                                </tr>
-                                <tr class="table-primary border-primary">
-                                    <td class="ps-4 fw-bold">10:30</td>
-                                    <td>
-                                        <div class="fw-bold">Lucía Jiménez Soto</div>
-                                        <span class="small text-muted">DNI: 66666666F</span>
-                                    </td>
-                                    <td>Control de Marcapasos</td>
-                                    <td><span class="badge rounded-pill bg-primary">En espera</span></td>
-                                    <td class="text-end pe-4">
-                                        <button class="btn btn-sm btn-primary">Iniciar Consulta</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-4 fw-bold">11:00</td>
-                                    <td>
-                                        <div class="fw-bold">Mario García Ramos</div>
-                                        <span class="small text-muted">DNI: 77777777G</span>
-                                    </td>
-                                    <td>Consulta General</td>
-                                    <td><span class="badge rounded-pill bg-light text-dark border">Programada</span></td>
-                                    <td class="text-end pe-4">
-                                        <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-eye"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="card-footer bg-white text-center py-3">
-                    <a href="#" class="text-decoration-none small fw-bold">Ver agenda completa</a>
+                <div class="bg-light p-3 text-center border-top">
+                    <a href="#" class="btn btn-sm btn-link text-primary text-decoration-none fw-bold">Ver agenda completa <i class="bi bi-arrow-right"></i></a>
                 </div>
             </div>
         </div>
 
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                <div class="card-header bg-white py-3">
-                    <h6 class="fw-bold mb-0 text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Alertas de Analíticas</h6>
+
+            <h5 class="fw-bold text-dark mb-3">
+                <i class="bi bi-bell-fill text-warning me-2"></i>Notificaciones
+            </h5>
+
+            <div class="doctor-card p-0 mb-4 border-start border-warning border-5 shadow-sm overflow-hidden">
+                <div class="bg-light px-4 py-3 border-bottom">
+                    <h6 class="fw-bold mb-0 text-dark">Alertas de Analíticas</h6>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex align-items-start mb-3 border-bottom pb-2">
-                        <div class="p-2 bg-danger bg-opacity-10 text-danger rounded me-3">
-                            <i class="bi bi-droplet-fill"></i>
+                <div class="p-4">
+                    <div class="d-flex align-items-start mb-4">
+                        <div class="p-2 bg-danger bg-opacity-10 text-danger rounded-3 me-3">
+                            <i class="bi bi-droplet-fill fs-5"></i>
                         </div>
                         <div>
-                            <div class="fw-bold small">Mario García (Glucosa)</div>
-                            <p class="small text-muted mb-0">Valor: 230 mg/dL (Alto)</p>
-                            <a href="#" class="small text-decoration-none">Ver Informe</a>
+                            <div class="fw-bold text-dark small">Mario García <span class="fw-normal text-muted">(Glucosa)</span></div>
+                            <p class="small text-danger fw-bold mb-1">Valor: 230 mg/dL (Alto)</p>
+                            <a href="#" class="small fw-bold text-decoration-none text-primary">Revisar resultados</a>
                         </div>
                     </div>
                     <div class="d-flex align-items-start">
-                        <div class="p-2 bg-warning bg-opacity-10 text-warning rounded me-3">
-                            <i class="bi bi-activity"></i>
+                        <div class="p-2 bg-warning bg-opacity-10 text-warning rounded-3 me-3">
+                            <i class="bi bi-activity fs-5"></i>
                         </div>
                         <div>
-                            <div class="fw-bold small">Lucía Jiménez (Colesterol)</div>
-                            <p class="small text-muted mb-0">Valor: 210 mg/dL (Límite)</p>
-                            <a href="#" class="small text-decoration-none">Ver Informe</a>
+                            <div class="fw-bold text-dark small">Lucía Jiménez <span class="fw-normal text-muted">(Colesterol)</span></div>
+                            <p class="small text-muted mb-1">Valor: 210 mg/dL (Límite)</p>
+                            <a href="#" class="small fw-bold text-decoration-none text-primary">Revisar resultados</a>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-white py-3">
-                    <h6 class="fw-bold mb-0"><i class="bi bi-person-check me-2"></i>Últimos Pacientes Asignados</h6>
+            <div class="doctor-card p-0 shadow-sm border-0 overflow-hidden">
+                <div class="bg-light px-4 py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0 text-dark">Últimos Pacientes</h6>
+                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill">Nuevos</span>
                 </div>
                 <div class="list-group list-group-flush">
-                    <div class="list-group-item d-flex align-items-center border-0 py-3">
-                        <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px; font-weight: bold;">RG</div>
-                        <div class="small">
-                            <div class="fw-bold">Roberto Gómez</div>
-                            <div class="text-muted">Asignado hoy</div>
+                    <div class="list-group-item d-flex align-items-center border-0 px-4 py-3">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold" style="width: 40px; height: 40px;">
+                            RG
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark small">Roberto Gómez</div>
+                            <div class="text-muted small">Asignado hoy</div>
                         </div>
                     </div>
-                    <div class="list-group-item d-flex align-items-center border-0 py-3">
-                        <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px; font-weight: bold;">AS</div>
-                        <div class="small">
-                            <div class="fw-bold">Ana Sanz</div>
-                            <div class="text-muted">Asignada ayer</div>
+                    <div class="list-group-item d-flex align-items-center border-0 px-4 py-3">
+                        <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold" style="width: 40px; height: 40px;">
+                            AS
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark small">Ana Sanz</div>
+                            <div class="text-muted small">Asignada ayer</div>
                         </div>
                     </div>
                 </div>
-                <div class="card-footer bg-white text-center py-2">
-                    <a href="#" class="small text-decoration-none">Ver mi lista completa</a>
+                <div class="bg-light p-2 text-center border-top">
+                    <a href="#" class="small fw-bold text-decoration-none text-muted">Ir a mi lista completa</a>
                 </div>
             </div>
+
         </div>
     </div>
 </div>

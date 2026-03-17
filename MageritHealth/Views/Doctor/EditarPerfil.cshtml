@@ -1,0 +1,93 @@
+﻿@using MageritHealth.Models.ViewModels
+@model EditPacienteViewModel
+
+@{
+    Layout = "_PacienteLayout";
+    ViewData["Title"] = "Editar Mi Perfil";
+}
+
+<div class="container mb-5">
+    <div class="d-flex align-items-center mb-4">
+        <a asp-controller="Doctor" asp-action="Perfil" class="btn btn-outline-secondary rounded-circle p-2 me-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <div>
+            <h3 class="fw-bold text-dark mb-0">Ajustes de Perfil</h3>
+            <p class="text-muted small mb-0">Actualiza tus preferencias y seguridad de acceso.</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            @Html.AntiForgeryToken()
+            <form asp-controller="Doctor" asp-action="EditarPerfil" method="post" class="needs-validation">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 shadow-sm border-danger border-opacity-25" role="alert"></div>
+
+                <h5 class="fw-bold text-dark mb-3">
+                    <i class="bi bi-person-lines-fill text-primary me-2"></i>Información de Contacto
+                </h5>
+
+                <div class="patient-card p-4 mb-4 border-start border-primary border-5 shadow-sm">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Telefono" class="form-label fw-bold text-dark small">Número de Teléfono</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-telephone text-muted"></i></span>
+                                <input asp-for="Telefono" class="form-control bg-light border-start-0 ps-0" placeholder="Ej: 600123456" />
+                            </div>
+                            <span asp-validation-for="Telefono" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label fw-bold text-dark small">Correo Electrónico</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                                <input asp-for="Email" type="email" class="form-control bg-light border-start-0 ps-0" placeholder="usuario@correo.com" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+                    <p class="small text-muted mt-3 mb-0"><i class="bi bi-info-circle me-1"></i> Estos datos serán utilizados para notificaciones del portal e informes médicos.</p>
+                </div>
+
+                <h5 class="fw-bold text-dark mb-3 mt-4">
+                    <i class="bi bi-shield-lock-fill text-warning me-2"></i>Seguridad de la Cuenta
+                </h5>
+
+                <div class="patient-card p-4 border-start border-warning border-5 shadow-sm mb-4">
+                    <div class="p-2 bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded-3 mb-4 d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill text-warning fs-5 me-2 ms-2"></i>
+                        <span class="small text-dark">Si no deseas cambiar tu contraseña actual, deja estos campos vacíos.</span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Password" class="form-label fw-bold text-dark small">Nueva Contraseña</label>
+                            <input asp-for="Password" type="password" class="form-control bg-light" placeholder="••••••••" />
+                            <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="ConfirmPassword" class="form-label fw-bold text-dark small">Confirmar Contraseña</label>
+                            <input asp-for="ConfirmPassword" type="password" class="form-control bg-light" placeholder="••••••••" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-controller="Doctor" asp-action="Perfil" class="btn btn-light fw-bold text-secondary">Descartar</a>
+                    <button type="submit" class="btn btn-primary fw-bold shadow-sm">
+                        <i class="bi bi-check2-circle me-1"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
