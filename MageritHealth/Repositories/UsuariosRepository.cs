@@ -130,6 +130,10 @@ namespace MageritHealth.Repositories
             Usuario savedUser = await this.context.Usuarios.FirstOrDefaultAsync(u => u.IdUsuario == changedUser.IdUsuario);
             if (savedUser != null)
             {
+                Credencial credencial = await this.context.Credenciales.FirstOrDefaultAsync(c => c.IdUsuario == savedUser.IdUsuario);
+                string salt = ToolsHelper.GenerateSalt();
+                credencial.Salt = salt;
+                credencial.PasswordHash = CryptographyHelper.EncryptPassword(changedUser.Pass, salt);
                 this.context.Entry(savedUser).CurrentValues.SetValues(changedUser);
                 await this.context.SaveChangesAsync();
             }
