@@ -139,6 +139,7 @@ namespace MageritHealth.Repositories
             {
                 cita.Estado = "completada";
                 cita.Notas = notasDoctor;
+                cita.Activa = false;
                 await this.context.SaveChangesAsync();
             }
         }
