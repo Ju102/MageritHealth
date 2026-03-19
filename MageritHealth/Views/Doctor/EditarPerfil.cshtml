@@ -1,16 +1,13 @@
 ﻿@using MageritHealth.Models.ViewModels
-@model EditPacienteViewModel
+@model EditUsuarioViewModel
 
 @{
-    Layout = "_PacienteLayout";
+    Layout = "_DoctorLayout";
     ViewData["Title"] = "Editar Mi Perfil";
 }
 
 <div class="container mb-5">
     <div class="d-flex align-items-center mb-4">
-        <a asp-controller="Doctor" asp-action="Perfil" class="btn btn-outline-secondary rounded-circle p-2 me-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-            <i class="bi bi-arrow-left"></i>
-        </a>
         <div>
             <h3 class="fw-bold text-dark mb-0">Ajustes de Perfil</h3>
             <p class="text-muted small mb-0">Actualiza tus preferencias y seguridad de acceso.</p>
@@ -27,7 +24,7 @@
                     <i class="bi bi-person-lines-fill text-primary me-2"></i>Información de Contacto
                 </h5>
 
-                <div class="patient-card p-4 mb-4 border-start border-primary border-5 shadow-sm">
+                <div class="doctor-card p-4 mb-4 border-start border-primary border-5 shadow-sm">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label asp-for="Telefono" class="form-label fw-bold text-dark small">Número de Teléfono</label>
@@ -54,7 +51,7 @@
                     <i class="bi bi-shield-lock-fill text-warning me-2"></i>Seguridad de la Cuenta
                 </h5>
 
-                <div class="patient-card p-4 border-start border-warning border-5 shadow-sm mb-4">
+                <div class="doctor-card p-4 border-start border-warning border-5 shadow-sm mb-4">
                     <div class="p-2 bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded-3 mb-4 d-flex align-items-center">
                         <i class="bi bi-exclamation-triangle-fill text-warning fs-5 me-2 ms-2"></i>
                         <span class="small text-dark">Si no deseas cambiar tu contraseña actual, deja estos campos vacíos.</span>

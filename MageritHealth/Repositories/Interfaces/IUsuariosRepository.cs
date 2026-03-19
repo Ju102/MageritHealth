@@ -8,7 +8,11 @@ namespace MageritHealth.Repositories.Interfaces
         Task<Usuario> LoginUsuarioAsync(string email, string password);
 
         Task<Usuario> GetUsuarioByIdAsync(int id);
+        Task<Usuario> GetUsuarioByEmailAsync(string email);
+
+        Task<List<Usuario>> GetUsuariosByDniYRolAsync(string dni, string rol);
         Task<List<Usuario>> GetListaUsuariosByRolAsync(string rol);
+        Task<int> GetRecuentoUsuariosByRolAsync(string rol);
 
         Task<List<Usuario>> GetListaPacientesByIdDoctorAsync(int idDoctor);
 

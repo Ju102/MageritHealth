@@ -1,0 +1,212 @@
+﻿@model List<MageritHealth.Models.Medicamento>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Gestión de Medicamentos";
+}
+
+<div class="container mb-5">
+    <!-- CABECERA -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div class="mb-3 mb-md-0">
+            <h3 class="fw-bold text-dark mb-0">Catálogo de Medicamentos</h3>
+            <p class="text-muted small">Gestión del vademécum y control de stock clínico.</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-success fw-bold shadow-sm text-white" data-bs-toggle="modal" data-bs-target="#modalNuevoMedicamento">
+                <i class="bi bi-capsule me-2"></i>Nuevo Medicamento
+            </button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small text-muted text-uppercase">
+                        <tr>
+                            <th class="ps-4 py-3">Medicamento</th>
+                            <th class="py-3">Concentración/Formato</th>
+                            <th class="py-3">Fabricante</th>
+                            <th class="py-3 text-center">Uso en Recetas</th>
+                            <th class="pe-4 py-3 text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var med in Model)
+                            {
+                                var numRecetas = med.Prescripciones?.Count ?? 0;
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="p-2 bg-success bg-opacity-10 rounded-3 text-success me-3">
+                                                <i class="bi bi-capsule-pill fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <span class="fw-bold text-dark d-block">@med.NombreComercial</span>
+                                                <small class="text-muted">@med.PrincipioActivo</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 text-muted small">
+                                        <div>@med.Concentracion</div>
+                                        <div>@med.Formato</div>
+                                    </td>
+                                    <td class="py-3 small text-dark">
+                                        @(med.Fabricante ?? "N/A")
+                                    </td>
+                                    <td class="py-3 text-center">
+                                        <span class="badge @(numRecetas > 0 ? "bg-primary" : "bg-secondary") bg-opacity-10 @(numRecetas > 0 ? "text-primary" : "text-muted") border rounded-pill px-3">
+                                            <i class="bi bi-receipt me-1"></i> @numRecetas recetas
+                                        </span>
+                                    </td>
+                                    <td class="pe-4 py-3 text-end">
+                                        <div class="btn-group shadow-sm rounded">
+                                            <button type="button" class="btn btn-white btn-sm border"
+                                                    onclick="gestionarEliminacionMed(@med.IdMedicamento, '@med.NombreComercial', @numRecetas)"
+                                                    title="Eliminar">
+                                                <i class="bi bi-trash3 text-danger"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <i class="bi bi-search display-4 text-muted d-block mb-3"></i>
+                                    <p class="text-muted">No hay medicamentos en el catálogo.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalErrorMed" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-body p-5 text-center">
+                <div class="text-danger mb-4">
+                    <i class="bi bi-shield-lock-fill" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="fw-bold text-dark">Registro Protegido</h4>
+                <p class="text-muted">El medicamento <strong id="errMedNombre" class="text-dark"></strong> no puede eliminarse porque figura en el historial de prescripciones de los pacientes.</p>
+                <button type="button" class="btn btn-secondary w-100 rounded-3 fw-bold mt-3" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalConfirmarMed" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-body p-5 text-center">
+                <div class="text-warning mb-4">
+                    <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="fw-bold text-dark">Confirmar eliminación</h4>
+                <p class="text-muted">¿Está seguro de eliminar <strong id="confMedNombre" class="text-dark"></strong>? Esta acción no se puede deshacer.</p>
+
+                <form asp-controller="Admin" asp-action="EliminarMedicamento" method="post">
+                    <input type="hidden" name="idmedicamento" id="inputEliminarMedId" value="" />
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="button" class="btn btn-light w-100 fw-bold border" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger w-100 fw-bold">Confirmar Borrado</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL NUEVO MEDICAMENTO -->
+<div class="modal fade" id="modalNuevoMedicamento" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-bottom-0 pt-4 px-4">
+                <h5 class="fw-bold"><i class="bi bi-capsule me-2 text-success"></i>Registrar Nuevo Medicamento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-4 pb-4">
+                <form asp-controller="Admin" asp-action="CrearMedicamento" method="post">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold text-muted">Nombre Comercial</label>
+                            <input name="nombrecomercial" type="text" class="form-control rounded-3" required placeholder="Ej: Paracetamol Normon">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted">Principio Activo</label>
+                            <input name="principioactivo" type="text" class="form-control rounded-3" required placeholder="Ej: Paracetamol">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted">Concentración</label>
+                            <input name="concentracion" type="text" class="form-control rounded-3" required placeholder="Ej: 1g">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted">Formato</label>
+                            <select name="Formato" class="form-select rounded-3" required>
+                                <option value="" selected disabled>Seleccione formato...</option>
+                                <option value="comprimidos">Comprimidos</option>
+                                <option value="jarabe">Jarabe</option>
+                                <option value="sobres">Sobres</option>
+                                <option value="inyectable">Inyectable</option>
+                                <option value="crema">Crema</option>
+                                <option value="gotas">Gotas</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted">Fabricante</label>
+                            <input name="fabricante" type="text" class="form-control rounded-3" placeholder="Ej: Normon S.A.">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 fw-bold py-2 rounded-3 mt-4 text-white">Guardar en Catálogo</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function gestionarEliminacionMed(id, nombre, count) {
+            if (count > 0) {
+                document.getElementById('errMedNombre').innerText = nombre;
+                var modalError = new bootstrap.Modal(document.getElementById('modalErrorMed'));
+                modalError.show();
+            } else {
+                document.getElementById('confMedNombre').innerText = nombre;
+                document.getElementById('inputEliminarMedId').value = id;
+                var modalConf = new bootstrap.Modal(document.getElementById('modalConfirmarMed'));
+                modalConf.show();
+            }
+        }
+    </script>
+}
+
+<style>
+    .btn-white {
+        background-color: #fff;
+    }
+
+        .btn-white:hover {
+            background-color: #f8f9fa;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(40, 167, 69, 0.02);
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "•";
+        color: #dee2e6;
+    }
+</style>

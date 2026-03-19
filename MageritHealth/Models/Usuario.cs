@@ -30,11 +30,9 @@ namespace MageritHealth.Models
         public bool Activo { get; set; } = true;
         public DateTime FechaCreacion { get; set; } = DateTime.Now;
 
-        // RELACIONES (FKs entrantes)
         [ForeignKey("IdEspecialidad")]
         public virtual Especialidad? Especialidad { get; set; }
 
-        // RELACIONES (Colecciones que dependen de este usuario)
         public virtual InfoClinicaPaciente InfoClinica { get; set; }
         public virtual ICollection<AntecedenteMedico> Antecedentes { get; set; }
         public virtual Credencial Credencial { get; set; }

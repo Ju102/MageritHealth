@@ -1,79 +1,84 @@
-﻿@{
+﻿@model DoctorDashboardViewModel
+@{
     Layout = "_DoctorLayout";
     ViewData["Title"] = "Panel Médico";
 }
+
+<style>
+    @@keyframes pulse-opacity {
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    .animate-pulse i {
+        animation: pulse-opacity 2s infinite;
+    }
+</style>
 
 <div class="container mb-5">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
         <div class="mb-3 mb-md-0">
             <h3 class="fw-bold text-dark mb-1">Bienvenido/a, Dr/a. @Context.User.Identity.Name</h3>
             <p class="text-muted small mb-0">
-                <span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill me-2">Cardiología</span>
-                <i class="bi bi-person-badge text-secondary me-1"></i>Colegiado: @Context.User.FindFirst("LicenseNumber").Value
+                <span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill me-2">@Context.User.FindFirst("Specialty")?.Value</span>
+                <i class="bi bi-person-badge text-secondary me-1"></i>Colegiado: @Context.User.FindFirst("LicenseNumber")?.Value
             </p>
-        </div>
-        <div class="d-flex gap-2">
-            <div class="input-group shadow-sm rounded-3">
-                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control border-start-0 ps-0" placeholder="Buscar paciente por DNI o Nombre...">
-                <button class="btn btn-primary fw-bold px-3">Buscar</button>
-            </div>
         </div>
     </div>
 
     <div class="row g-4 mb-5">
-        <div class="col-md-6 col-xl-3">
+        <div class="col-md-6 col-xl-4">
             <div class="doctor-card doctor-stat-card p-4 border-start border-primary border-5 shadow-sm h-100">
                 <h6 class="text-muted small fw-bold text-uppercase mb-3">Citas Hoy</h6>
                 <div class="d-flex align-items-center justify-content-between">
-                    <span class="display-5 fw-bold text-dark lh-1">8</span>
+                    <span class="display-5 fw-bold text-dark lh-1">@Model.TotalCitasHoy</span>
                     <div class="p-3 bg-primary bg-opacity-10 text-primary rounded-circle">
                         <i class="bi bi-calendar-check fs-4"></i>
                     </div>
                 </div>
-                <p class="small text-primary fw-bold mb-0 mt-3"><i class="bi bi-clock me-1"></i> Siguiente: 10:30 AM</p>
+                <p class="small text-muted mb-0 mt-3">Emitidas recientemente</p>
             </div>
         </div>
-        <div class="col-md-6 col-xl-3">
-            <div class="doctor-card doctor-stat-card p-4 border-start border-info border-5 shadow-sm h-100">
-                <h6 class="text-muted small fw-bold text-uppercase mb-3">Pacientes Asignados</h6>
-                <div class="d-flex align-items-center justify-content-between">
-                    <span class="display-5 fw-bold text-dark lh-1">142</span>
-                    <div class="p-3 bg-info bg-opacity-10 text-info rounded-circle">
-                        <i class="bi bi-person-heart fs-4"></i>
-                    </div>
-                </div>
-                <p class="small text-muted mb-0 mt-3"><i class="bi bi-graph-up text-success me-1"></i> +3 este mes</p>
-            </div>
-        </div>
-        <div class="col-md-6 col-xl-3">
+        <div class="col-md-6 col-xl-4">
             <div class="doctor-card doctor-stat-card p-4 border-start border-warning border-5 shadow-sm h-100">
                 <h6 class="text-muted small fw-bold text-uppercase mb-3">Analíticas Ptes.</h6>
                 <div class="d-flex align-items-center justify-content-between">
-                    <span class="display-5 fw-bold text-dark lh-1">5</span>
+                    <span class="display-5 fw-bold text-dark lh-1">@Model.AnaliticasPendientes</span>
                     <div class="p-3 bg-warning bg-opacity-10 text-warning rounded-circle">
                         <i class="bi bi-clipboard2-pulse fs-4"></i>
                     </div>
                 </div>
-                <p class="small text-danger fw-bold mb-0 mt-3"><i class="bi bi-exclamation-circle me-1"></i> 2 requieren revisión urgente</p>
+                @if (Model.AnaliticasPendientes > 0)
+                {
+                    <p class="small text-danger fw-bold mb-0 mt-3"><i class="bi bi-exclamation-circle me-1"></i> Pendientes de revisión</p>
+                }
             </div>
         </div>
-        <div class="col-md-6 col-xl-3">
+        <div class="col-md-6 col-xl-4">
             <div class="doctor-card doctor-stat-card p-4 border-start border-success border-5 shadow-sm h-100">
                 <h6 class="text-muted small fw-bold text-uppercase mb-3">Prescripciones</h6>
                 <div class="d-flex align-items-center justify-content-between">
-                    <span class="display-5 fw-bold text-dark lh-1">12</span>
+                    <span class="display-5 fw-bold text-dark lh-1">@Model.PrescripcionesRecientes</span>
                     <div class="p-3 bg-success bg-opacity-10 text-success rounded-circle">
                         <i class="bi bi-prescription2 fs-4"></i>
                     </div>
                 </div>
-                <p class="small text-muted mb-0 mt-3">Emitidas en las últimas 24h</p>
+                <p class="small text-muted mb-0 mt-3">Emitidas recientemente</p>
             </div>
         </div>
     </div>
 
     <div class="row g-4">
-        <div class="col-lg-8">
+        <div class="col-lg-12">
             <h5 class="fw-bold text-dark mb-3">
                 <i class="bi bi-calendar-day text-primary me-2"></i>Agenda de Hoy <span class="text-muted fs-6 fw-normal">- @DateTime.Now.ToString("dd MMM yyyy")</span>
             </h5>
@@ -91,121 +96,128 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="border-bottom">
-                                <td class="ps-4 py-3 text-muted fw-bold">10:00</td>
-                                <td class="py-3">
-                                    <div class="fw-bold text-dark">Mario García Pérez</div>
-                                    <span class="small text-muted">DNI: 55555555E</span>
-                                </td>
-                                <td class="py-3 text-secondary">Revisión Anual</td>
-                                <td class="py-3">
-                                    <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill small">Completada</span>
-                                </td>
-                                <td class="text-end pe-4 py-3">
-                                    <button class="btn btn-sm btn-light text-primary rounded-circle" title="Ver Informe"><i class="bi bi-file-earmark-medical"></i></button>
-                                </td>
-                            </tr>
-                            <tr class="bg-primary bg-opacity-10 border-start border-primary border-4">
-                                <td class="ps-4 py-3 text-primary fw-bold">10:30</td>
-                                <td class="py-3">
-                                    <div class="fw-bold text-dark">Lucía Jiménez Soto</div>
-                                    <span class="small text-muted">DNI: 66666666F</span>
-                                </td>
-                                <td class="py-3 text-secondary">Control de Marcapasos</td>
-                                <td class="py-3">
-                                    <span class="badge bg-primary text-white rounded-pill small">Siguiente</span>
-                                </td>
-                                <td class="text-end pe-4 py-3">
-                                    <a asp-controller="Doctor" asp-action="Consulta" class="btn btn-sm btn-primary fw-bold shadow-sm">Iniciar Consulta</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="ps-4 py-3 text-dark fw-bold">11:00</td>
-                                <td class="py-3">
-                                    <div class="fw-bold text-dark">Mario García Ramos</div>
-                                    <span class="small text-muted">DNI: 77777777G</span>
-                                </td>
-                                <td class="py-3 text-secondary">Consulta General</td>
-                                <td class="py-3">
-                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary rounded-pill small">Programada</span>
-                                </td>
-                                <td class="text-end pe-4 py-3">
-                                    <button class="btn btn-sm btn-light text-secondary rounded-circle" title="Ver Ficha"><i class="bi bi-eye"></i></button>
-                                </td>
-                            </tr>
+                            @if (Model.AgendaHoy != null && Model.AgendaHoy.Any())
+                            {
+                                bool hayCitaEnCurso = Model.AgendaHoy.Any(c => c.Estado.Equals("Progreso", StringComparison.OrdinalIgnoreCase));
+                                bool primeraProgramadaEncontrada = false;
+
+                                @foreach (var cita in Model.AgendaHoy)
+                                {
+                                    bool esProgramada = cita.Estado.Equals("Programada", StringComparison.OrdinalIgnoreCase);
+                                    bool enProgreso = cita.Estado.Equals("Progreso", StringComparison.OrdinalIgnoreCase);
+
+                                    bool esSiguienteParaIniciar = esProgramada && !hayCitaEnCurso && !primeraProgramadaEncontrada;
+
+                                    if (esSiguienteParaIniciar)
+                                    {
+                                        primeraProgramadaEncontrada = true;
+                                    }
+
+                                    string filaClase = enProgreso ? "bg-warning bg-opacity-10 border-start border-warning border-4 shadow-sm" :
+                                    (esSiguienteParaIniciar ? "bg-primary bg-opacity-10 border-start border-primary border-4" : "border-bottom");
+
+                                    string horaClase = enProgreso ? "text-dark fw-bold fs-5" :
+                                    (esSiguienteParaIniciar ? "text-primary fw-bold" : "text-muted fw-bold");
+
+                                    <tr class="@filaClase position-relative">
+                                        <td class="ps-4 py-3 @horaClase">
+                                            @cita.FechaHora.ToString("HH:mm")
+                                        </td>
+                                        <td class="py-3">
+                                            <div class="fw-bold text-dark">@(cita.Paciente?.Nombre) @(cita.Paciente?.Apellido1)</div>
+                                            <span class="small text-muted">DNI: @(cita.Paciente?.Dni ?? "N/A")</span>
+                                        </td>
+                                        <td class="py-3 text-secondary text-truncate" style="max-width: 150px;" title="@cita.Motivo">
+                                            @cita.Motivo
+                                        </td>
+                                        <td class="py-3">
+                                            @if (enProgreso)
+                                            {
+                                                <span class="badge bg-warning bg-opacity-25 text-dark border border-warning rounded-pill px-3 py-2 small animate-pulse">
+                                                    <i class="bi bi-record-circle-fill text-danger me-1"></i> En Curso
+                                                </span>
+                                            }
+                                            else if (cita.Estado.Equals("Completada", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill small">Completada</span>
+                                            }
+                                            else if (cita.Estado.Equals("Programada", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <span class="badge bg-info text-white rounded-pill small">Programada</span>
+                                            }
+                                            else if (cita.Estado.Equals("Cancelada", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill small">Cancelada</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary rounded-pill small">@cita.Estado</span>
+                                            }
+                                        </td>
+                                        <td class="text-end pe-4 py-3">
+                                            @if (enProgreso)
+                                            {
+                                                <a asp-controller="Doctor" asp-action="Consulta" asp-route-id="@cita.IdCita" class="btn btn-sm btn-warning fw-bold text-dark shadow-sm px-3">
+                                                    <i class="bi bi-play-fill me-1"></i>Continuar
+                                                </a>
+                                            }
+                                            else if (esProgramada)
+                                            {
+                                                <div class="d-flex justify-content-end gap-1">
+                                                    @if (esSiguienteParaIniciar)
+                                                    {
+                                                        <a asp-controller="Doctor" asp-action="Consulta" asp-route-id="@cita.IdCita" class="btn btn-sm btn-info fw-bold text-white shadow-sm">
+                                                            <i class="bi bi-play-fill me-1"></i>Iniciar
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button class="btn btn-sm btn-light text-muted fw-bold shadow-sm" disabled title="Debes finalizar la consulta actual para iniciar esta.">
+                                                            <i class="bi bi-lock-fill"></i>
+                                                        </button>
+                                                    }
+                                                </div>
+                                            }
+                                            else if (cita.Estado.Equals("Completada", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <button class="btn btn-sm btn-light text-primary rounded-circle" title="Ver Informe"><i class="bi bi-file-earmark-medical"></i></button>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-sm btn-light text-secondary rounded-circle" title="Ver Ficha"><i class="bi bi-eye"></i></button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="bi bi-calendar-x fs-2 opacity-50 d-block mb-2"></i>
+                                        No hay citas programadas para el día de hoy.
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
                 <div class="bg-light p-3 text-center border-top">
-                    <a href="#" class="btn btn-sm btn-link text-primary text-decoration-none fw-bold">Ver agenda completa <i class="bi bi-arrow-right"></i></a>
+                    <a asp-controller="Doctor" asp-action="Agenda" class="btn btn-sm btn-link text-primary text-decoration-none fw-bold">Ver agenda completa <i class="bi bi-arrow-right"></i></a>
                 </div>
             </div>
-        </div>
-
-        <div class="col-lg-4">
-
-            <h5 class="fw-bold text-dark mb-3">
-                <i class="bi bi-bell-fill text-warning me-2"></i>Notificaciones
-            </h5>
-
-            <div class="doctor-card p-0 mb-4 border-start border-warning border-5 shadow-sm overflow-hidden">
-                <div class="bg-light px-4 py-3 border-bottom">
-                    <h6 class="fw-bold mb-0 text-dark">Alertas de Analíticas</h6>
-                </div>
-                <div class="p-4">
-                    <div class="d-flex align-items-start mb-4">
-                        <div class="p-2 bg-danger bg-opacity-10 text-danger rounded-3 me-3">
-                            <i class="bi bi-droplet-fill fs-5"></i>
-                        </div>
-                        <div>
-                            <div class="fw-bold text-dark small">Mario García <span class="fw-normal text-muted">(Glucosa)</span></div>
-                            <p class="small text-danger fw-bold mb-1">Valor: 230 mg/dL (Alto)</p>
-                            <a href="#" class="small fw-bold text-decoration-none text-primary">Revisar resultados</a>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-start">
-                        <div class="p-2 bg-warning bg-opacity-10 text-warning rounded-3 me-3">
-                            <i class="bi bi-activity fs-5"></i>
-                        </div>
-                        <div>
-                            <div class="fw-bold text-dark small">Lucía Jiménez <span class="fw-normal text-muted">(Colesterol)</span></div>
-                            <p class="small text-muted mb-1">Valor: 210 mg/dL (Límite)</p>
-                            <a href="#" class="small fw-bold text-decoration-none text-primary">Revisar resultados</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="doctor-card p-0 shadow-sm border-0 overflow-hidden">
-                <div class="bg-light px-4 py-3 border-bottom d-flex justify-content-between align-items-center">
-                    <h6 class="fw-bold mb-0 text-dark">Últimos Pacientes</h6>
-                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill">Nuevos</span>
-                </div>
-                <div class="list-group list-group-flush">
-                    <div class="list-group-item d-flex align-items-center border-0 px-4 py-3">
-                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold" style="width: 40px; height: 40px;">
-                            RG
-                        </div>
-                        <div>
-                            <div class="fw-bold text-dark small">Roberto Gómez</div>
-                            <div class="text-muted small">Asignado hoy</div>
-                        </div>
-                    </div>
-                    <div class="list-group-item d-flex align-items-center border-0 px-4 py-3">
-                        <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold" style="width: 40px; height: 40px;">
-                            AS
-                        </div>
-                        <div>
-                            <div class="fw-bold text-dark small">Ana Sanz</div>
-                            <div class="text-muted small">Asignada ayer</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-light p-2 text-center border-top">
-                    <a href="#" class="small fw-bold text-decoration-none text-muted">Ir a mi lista completa</a>
-                </div>
-            </div>
-
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Inicializar tooltips de Bootstrap
+        document.addEventListener("DOMContentLoaded", function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+}

@@ -5,10 +5,13 @@
     Layout = "_PacienteLayout";
     ViewData["Title"] = "Mis Citas Médicas";
 
-    var citasProximas = Model.Where(c => c.Estado.ToLower() == "programada")
+    // Agrupamos los estados activos para filtrar más fácilmente
+    var estadosActivos = new[] { "programada", "progreso", "en curso" };
+
+    var citasProximas = Model.Where(c => estadosActivos.Contains(c.Estado.ToLower()))
                              .OrderBy(c => c.FechaHora).ToList();
 
-    var historialCitas = Model.Where(c => c.Estado.ToLower() != "programada")
+    var historialCitas = Model.Where(c => !estadosActivos.Contains(c.Estado.ToLower()))
                               .OrderByDescending(c => c.FechaHora).ToList();
 }
 
@@ -34,15 +37,29 @@
                 <div class="row g-4">
                     @foreach (var cita in citasProximas)
                     {
+                        // Lógica dinámica de colores según el estado individual de la cita
+                        bool enProgreso = cita.Estado.Equals("progreso", StringComparison.OrdinalIgnoreCase) || cita.Estado.Equals("en curso", StringComparison.OrdinalIgnoreCase);
+
+                        string borderClass = enProgreso ? "border-warning" : "border-info";
+                        string badgeClass = enProgreso ? "bg-warning text-dark border-warning" : "bg-info bg-opacity-10 text-info border-info";
+                        string textAccentClass = enProgreso ? "text-warning" : "text-info";
+                        string textoEstado = enProgreso ? "En Curso Ahora" : "Programada";
+
                         <div class="col-lg-6">
-                            <div class="patient-card p-4 h-100 border-start border-info border-5 shadow-sm position-relative d-flex flex-column">
+                            <div class="patient-card p-4 h-100 border-start @borderClass border-5 shadow-sm position-relative d-flex flex-column">
                                 <div class="position-absolute top-0 end-0 p-3">
-                                    <span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill small">Programada</span>
+                                    <span class="badge @badgeClass border rounded-pill small px-3">
+                                        @if (enProgreso)
+                                        {
+                                            <i class="bi bi-record-circle-fill text-danger me-1"></i>
+                                        }
+                                        @textoEstado
+                                    </span>
                                 </div>
 
                                 <div class="d-flex align-items-center mb-3 mt-4 mt-sm-0">
                                     <div class="me-3 text-center border-end pe-3">
-                                        <h2 class="fw-bold text-info mb-0">@cita.FechaHora.ToString("dd")</h2>
+                                        <h2 class="fw-bold @textAccentClass mb-0">@cita.FechaHora.ToString("dd")</h2>
                                         <span class="text-muted small text-uppercase fw-bold">@cita.FechaHora.ToString("MMM")</span>
                                     </div>
                                     <div>
@@ -56,11 +73,14 @@
                                     <p class="mb-1 text-muted ms-4">Dr./a. @cita.Doctor.Nombre @cita.Doctor.Apellido1</p>
                                 </div>
 
-                                <div class="text-end mt-auto">
-                                    <a asp-controller="Paciente" asp-action="DetallesCita" asp-route-idcita="@cita.IdCita" class="btn btn-sm btn-light text-primary fw-bold shadow-sm">
-                                        <i class="bi bi-file-earmark-medical me-1"></i>Informe
-                                    </a>
-                                </div>
+                                @if (!enProgreso)
+                                {
+                                    <div class="text-end mt-auto">
+                                        <a asp-controller="Paciente" asp-action="DetallesCita" asp-route-idcita="@cita.IdCita" class="btn btn-sm btn-light text-primary fw-bold shadow-sm">
+                                            <i class="bi bi-file-earmark-medical me-1"></i>Detalles
+                                        </a>
+                                    </div>
+                                }
                             </div>
                         </div>
                     }
@@ -121,9 +141,13 @@
                                             {
                                                 <span class="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill small">Cancelada</span>
                                             }
+                                            else if (cita.Estado.ToLower() == "ausencia")
+                                            {
+                                                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary rounded-pill small">No Asistió</span>
+                                            }
                                             else
                                             {
-                                                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary rounded-pill small">@cita.Estado</span>
+                                                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary rounded-pill small text-capitalize">@cita.Estado</span>
                                             }
                                         </td>
                                         <td class="text-end pe-4 py-3">

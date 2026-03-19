@@ -1,5 +1,4 @@
-﻿@using MageritHealth.Models.ViewModels
-@model PacienteDashboardViewModel
+﻿@model PacienteDashboardViewModel
 
 @{
     Layout = "_PacienteLayout";
@@ -7,6 +6,7 @@
 }
 
 <div class="container mb-5">
+    <!-- CABECERA PRINCIPAL -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h3 class="fw-bold text-dark mb-0">Hola de nuevo, @Model.Nombre</h3>
@@ -18,28 +18,46 @@
     </div>
 
     <div class="row g-4">
+        <!-- COLUMNA PRINCIPAL (CITAS) -->
         <div class="col-lg-8">
             <h5 class="fw-bold text-dark mb-3">
                 <i class="bi bi-calendar-event text-primary me-2"></i>Próxima Cita
             </h5>
 
-            <div class="patient-card p-4 mb-5 border-start border-info border-5 shadow-sm">
-                @if (Model.ProximaCita != null)
+            @{
+                // Lógica dinámica de colores según el estado
+                bool hayCita = Model.ProximaCita != null;
+                bool enProgreso = hayCita && (Model.ProximaCita.Estado.Equals("progreso", StringComparison.OrdinalIgnoreCase) || Model.ProximaCita.Estado.Equals("en curso", StringComparison.OrdinalIgnoreCase));
+
+                string cardBorderClass = enProgreso ? "border-warning" : "border-info";
+                string badgeClass = enProgreso ? "bg-warning text-dark border-warning" : "bg-primary text-info border-info";
+                string textAccentClass = enProgreso ? "text-warning" : "text-info";
+                string textoEstado = enProgreso ? "En Curso Ahora" : "Programada";
+            }
+
+            <div class="patient-card p-4 mb-5 border-start @cardBorderClass border-5 shadow-sm position-relative">
+                @if (hayCita)
                 {
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <div class="mb-2">
-                                <span class="badge bg-primary bg-opacity-10 text-info border border-info rounded-pill small">Programada</span>
+                                <span class="badge @badgeClass bg-opacity-10 border rounded-pill small px-3">
+                                    @if (enProgreso)
+                                    {
+                                        <i class="bi bi-record-circle-fill text-danger me-1"></i>
+                                    }
+                                    @textoEstado
+                                </span>
                             </div>
 
                             <h4 class="fw-bold text-dark mb-1">@Model.ProximaCita.Motivo</h4>
                             <p class="text-muted mb-0">
-                                <i class="bi bi-person-badge text-primary me-2"></i>Dr/a. @Model.ProximaCita.Doctor.Nombre @Model.ProximaCita.Doctor.Apellido1 @Model.ProximaCita.Doctor.Apellido2
+                                <i class="bi bi-person-badge @textAccentClass me-2"></i>Dr/a. @Model.ProximaCita.Doctor.Nombre @Model.ProximaCita.Doctor.Apellido1 @Model.ProximaCita.Doctor.Apellido2
                             </p>
                         </div>
 
                         <div class="col-md-4 text-md-end mt-3 mt-md-0 border-md-start ps-md-4">
-                            <h2 class="fw-bold text-info mb-0">
+                            <h2 class="fw-bold @textAccentClass mb-0">
                                 @Model.ProximaCita.FechaHora.ToString("dd")
                                 <span class="fs-5 text-muted fw-normal text-uppercase">@Model.ProximaCita.FechaHora.ToString("MMM")</span>
                             </h2>
@@ -58,6 +76,7 @@
                 }
             </div>
 
+            <!-- HISTORIAL DE CITAS -->
             <h5 class="fw-bold text-dark mb-3 mt-4">
                 <i class="bi bi-clock-history text-secondary me-2"></i>Consultas Recientes
             </h5>
@@ -88,6 +107,7 @@
             </div>
         </div>
 
+        <!-- COLUMNA LATERAL (RESUMEN VITAL Y MEDICACIÓN) -->
         <div class="col-lg-4">
             <h5 class="fw-bold text-dark mb-3">
                 <i class="bi bi-activity text-danger me-2"></i>Resumen Vital

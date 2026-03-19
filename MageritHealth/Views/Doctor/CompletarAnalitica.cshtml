@@ -1,0 +1,208 @@
+﻿@using MageritHealth.Models
+@using MageritHealth.Models.ViewModels
+@model CompletarAnaliticaViewModel
+@{
+    Layout = "_DoctorLayout";
+    ViewData["Title"] = "Completar Resultados de Analítica";
+
+    var tiposMedicion = ViewBag.TiposMedicion as List<TipoMedicion> ?? new List<TipoMedicion>();
+}
+
+<div class="container mb-5">
+    <!-- Cabecera -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 border-bottom pb-4">
+        <div class="d-flex align-items-center mb-3 mb-md-0">
+            <a asp-controller="Doctor" asp-action="Analiticas" class="btn btn-outline-secondary rounded-circle p-2 me-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="Volver a Analíticas">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div>
+                <h3 class="fw-bold text-dark mb-0">Registro de Resultados</h3>
+                <span class="badge bg-warning bg-opacity-25 text-dark border border-warning rounded-pill mt-1 text-uppercase">
+                    Analítica #@Model.IdAnalitica - @Model.EstadoActual
+                </span>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" form="formResultados" class="btn btn-success fw-bold shadow-sm rounded-3 px-4">
+                <i class="bi bi-save-fill me-2"></i> Guardar Resultados
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="doctor-card p-4 border-start border-warning border-5 shadow-sm mb-4">
+                <h6 class="fw-bold text-dark mb-4 border-bottom pb-2"><i class="bi bi-file-text text-warning text-darken me-2"></i>Datos de la Petición</h6>
+
+                <div class="mb-3">
+                    <small class="text-muted fw-bold d-block text-uppercase mb-1">Paciente</small>
+                    <div class="fw-bold text-dark fs-5">@Model.NombrePaciente</div>
+                    <div class="text-muted small">DNI: @Model.DniPaciente</div>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted fw-bold d-block text-uppercase mb-1">Fecha Solicitud</small>
+                    <div class="text-dark small fw-medium">@Model.FechaSolicitud.ToString("dd MMM yyyy")</div>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted fw-bold d-block text-uppercase mb-1">Doctor Solicitante</small>
+                    <div class="text-dark small fw-medium">@Model.NombreDoctor</div>
+                </div>
+
+                <div class="mb-0">
+                    <small class="text-muted fw-bold d-block text-uppercase mb-1">Motivo / Instrucciones</small>
+                    <div class="p-3 bg-light rounded-3 border mt-1 small fst-italic text-dark">
+                        "@Model.MotivoCita"
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="doctor-card shadow-sm border-0 rounded-4 h-100 d-flex flex-column p-4 p-md-5">
+
+                <form id="formResultados" asp-controller="Doctor" asp-action="CompletarAnalitica" method="post">
+                    <input type="hidden" asp-for="IdAnalitica" />
+                    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                        <h6 class="fw-bold text-primary mb-0"><i class="bi bi-list-check me-2"></i>Valores Analizados</h6>
+                        <button type="button" id="btnAddMedicion" class="btn btn-sm btn-outline-primary fw-bold shadow-sm">
+                            <i class="bi bi-plus-lg me-1"></i>Añadir Fila
+                        </button>
+                    </div>
+
+                    <div class="table-responsive mb-4">
+                        <table class="table table-borderless align-middle" id="tablaMediciones">
+                            <thead class="small text-muted text-uppercase border-bottom">
+                                <tr>
+                                    <th style="width: 45%;">Parámetro</th>
+                                    <th style="width: 30%;">Valor Registrado</th>
+                                    <th style="width: 15%;">Unidad</th>
+                                    <th style="width: 10%;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="medicionesBody">
+                                <tr class="medicion-row border-bottom">
+                                    <td>
+                                        <select name="TiposMedicion[]" class="form-select bg-light border-0 shadow-sm param-select" required>
+                                            <option value="">Seleccione parámetro...</option>
+                                            @foreach (var tipo in tiposMedicion)
+                                            {
+                                                <option value="@tipo.IdTipoMedicion" data-unidad="@tipo.UnidadMedicion" data-min="@tipo.ValorMinimo" data-max="@tipo.ValorMaximo">
+                                                    @tipo.NombreMedicion
+                                                </option>
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" step="0.01" name="Valores[]" class="form-control border shadow-sm valor-input" placeholder="0.00" required>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary border rounded-pill px-3 py-2 w-100 unidad-label">---</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <button type="button" class="btn btn-sm btn-outline-danger border-0 btnRemoveMedicion" disabled>
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mb-4 mt-5">
+                        <label class="form-label fw-bold text-dark mb-3 d-block border-bottom pb-2">
+                            <i class="bi bi-journal-medical text-success me-2"></i>Conclusión y Observaciones del Facultativo
+                        </label>
+                        <div class="p-4 bg-success bg-opacity-10 border border-success border-opacity-25 rounded-3 mb-3">
+                            <span class="fw-bold small text-uppercase text-success d-block mb-2">
+                                <i class="bi bi-info-circle-fill me-1"></i> Importante
+                            </span>
+                            <p class="text-dark small mb-0">Estas notas formarán parte del informe oficial de la analítica que el paciente podrá descargar o consultar desde su portal.</p>
+                        </div>
+                        <textarea asp-for="NotasDoctor" class="form-control bg-light border-0 shadow-sm rounded-4 p-4" rows="6" placeholder="Redacte el juicio clínico derivado de estos resultados..."></textarea>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-warning-darken {
+        color: #856404 !important;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background-color: #fff !important;
+        border-color: #0d6efd !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15) !important;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const tbody = document.getElementById('medicionesBody');
+            const btnAdd = document.getElementById('btnAddMedicion');
+
+            function initRowEvents(row) {
+                const select = row.querySelector('.param-select');
+                const unidadLabel = row.querySelector('.unidad-label');
+                const btnRemove = row.querySelector('.btnRemoveMedicion');
+
+                select.addEventListener('change', function() {
+                    if (this.selectedIndex > 0) {
+                        const selectedOption = this.options[this.selectedIndex];
+                        unidadLabel.textContent = selectedOption.getAttribute('data-unidad');
+                        unidadLabel.classList.remove('bg-secondary', 'text-secondary');
+                        unidadLabel.classList.add('bg-primary', 'text-primary');
+                    } else {
+                        unidadLabel.textContent = '---';
+                        unidadLabel.classList.remove('bg-primary', 'text-primary');
+                        unidadLabel.classList.add('bg-secondary', 'text-secondary');
+                    }
+                });
+
+                btnRemove.addEventListener('click', function() {
+                    if (tbody.querySelectorAll('.medicion-row').length > 1) {
+                        row.remove();
+                        updateRemoveButtons();
+                    }
+                });
+            }
+
+            function updateRemoveButtons() {
+                const rows = tbody.querySelectorAll('.medicion-row');
+                const btns = tbody.querySelectorAll('.btnRemoveMedicion');
+
+                if (rows.length === 1) {
+                    btns[0].disabled = true;
+                } else {
+                    btns.forEach(btn => btn.disabled = false);
+                }
+            }
+
+            initRowEvents(tbody.querySelector('.medicion-row'));
+
+            btnAdd.addEventListener('click', function() {
+                const firstRow = tbody.querySelector('.medicion-row');
+                const newRow = firstRow.cloneNode(true);
+
+                newRow.querySelector('.param-select').selectedIndex = 0;
+                newRow.querySelector('.valor-input').value = '';
+
+                const label = newRow.querySelector('.unidad-label');
+                label.textContent = '---';
+                label.classList.remove('bg-primary', 'text-primary');
+                label.classList.add('bg-secondary', 'text-secondary');
+
+                tbody.appendChild(newRow);
+                initRowEvents(newRow);
+                updateRemoveButtons();
+            });
+        });
+    </script>
+}

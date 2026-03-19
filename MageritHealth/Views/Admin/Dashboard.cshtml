@@ -1,224 +1,191 @@
-﻿@{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+﻿@using MageritHealth.Models.ViewModels
+@model AdminDashboardViewModel
+@{
+    Layout = "_AdminLayout";
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<div class="container">
-    @if (ViewData["mensaje"] != null)
-    {
-        <div>
-            <p>@TempData["mensaje"].ToString()</p>
-        </div>
-    }
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
+<div class="container mb-5">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div class="mb-3 mb-md-0">
             <h3 class="fw-bold text-dark mb-0">Centro de Control Global</h3>
             <p class="text-muted small">Resumen del sistema clínico y accesos rápidos.</p>
         </div>
 
-        <div class="d-flex gap-2">
-            <a class="btn btn-clinic-main fw-bold" asp-controller="Admin" asp-action="RegisterDoctor">
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-primary fw-bold shadow-sm" asp-controller="Admin" asp-action="RegisterDoctor">
                 <i class="bi bi-person-plus-fill me-2"></i>Nuevo Doctor
             </a>
-
-            <a class="btn btn-clinic-main fw-bold" asp-controller="Admin" asp-action="RegisterPaciente">
+            <a class="btn btn-success fw-bold shadow-sm text-white" asp-controller="Admin" asp-action="RegisterPaciente">
                 <i class="bi bi-person-plus-fill me-2"></i>Nuevo Paciente
             </a>
-
-            <a class="btn btn-clinic-main bg-warning fw-bold" asp-controller="Admin" asp-action="RegisterAdmin">
-                <i class="bi bi-person-plus-fill me-2"></i>Nuevo Admin
+            <a class="btn btn-warning fw-bold shadow-sm text-dark" asp-controller="Admin" asp-action="RegisterAdmin">
+                <i class="bi bi-shield-lock-fill me-2"></i>Nuevo Admin
             </a>
         </div>
     </div>
 
-    <!-- MÉTRICAS PRINCIPALES -->
-
     <div class="row g-4 mb-4">
-
-        <div class="col-md-3">
-            <div class="admin-stat-card border-start border-primary border-4">
-                <div class="d-flex justify-content-between">
+        <div class="col-md-6 col-xl-3">
+            <div class="admin-stat-card bg-white p-4 rounded-4 shadow-sm border-start border-primary border-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <div class="text-muted small fw-bold">PACIENTES REGISTRADOS</div>
-                        <div class="fs-3 fw-bold">3</div>
+                        <div class="text-muted small fw-bold mb-1">PACIENTES REGISTRADOS</div>
+                        <div class="fs-2 fw-bold text-dark lh-1">@Model.TotalPacientes</div>
                     </div>
-                    <i class="bi bi-people fs-3 text-primary"></i>
+                    <div class="p-3 bg-primary bg-opacity-10 rounded-circle text-primary">
+                        <i class="bi bi-people fs-4"></i>
+                    </div>
                 </div>
-                <div class="small text-muted mt-2">Usuarios con rol paciente</div>
+                <div class="small text-muted mt-3">Usuarios con rol paciente</div>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="admin-stat-card border-start border-info border-4">
-                <div class="d-flex justify-content-between">
+        <div class="col-md-6 col-xl-3">
+            <div class="admin-stat-card bg-white p-4 rounded-4 shadow-sm border-start border-info border-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <div class="text-muted small fw-bold">DOCTORES ACTIVOS</div>
-                        <div class="fs-3 fw-bold">2</div>
+                        <div class="text-muted small fw-bold mb-1">DOCTORES ACTIVOS</div>
+                        <div class="fs-2 fw-bold text-dark lh-1">@Model.TotalDoctoresActivos</div>
                     </div>
-                    <i class="bi bi-heart-pulse fs-3 text-info"></i>
+                    <div class="p-3 bg-info bg-opacity-10 rounded-circle text-info">
+                        <i class="bi bi-heart-pulse fs-4"></i>
+                    </div>
                 </div>
-                <div class="small text-muted mt-2">3 especialidades médicas</div>
+                <div class="small text-muted mt-3">Facultativos disponibles</div>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="admin-stat-card border-start border-warning border-4">
-                <div class="d-flex justify-content-between">
+        <div class="col-md-6 col-xl-3">
+            <div class="admin-stat-card bg-white p-4 rounded-4 shadow-sm border-start border-warning border-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <div class="text-muted small fw-bold">CITAS PROGRAMADAS</div>
-                        <div class="fs-3 fw-bold">2</div>
+                        <div class="text-muted small fw-bold mb-1">CITAS PROGRAMADAS</div>
+                        <div class="fs-2 fw-bold text-dark lh-1">@Model.CitasProgramadas</div>
                     </div>
-                    <i class="bi bi-calendar-check fs-3 text-warning"></i>
+                    <div class="p-3 bg-warning bg-opacity-25 rounded-circle text-warning text-darken" style="color: #856404 !important;">
+                        <i class="bi bi-calendar-check fs-4"></i>
+                    </div>
                 </div>
-                <div class="small text-muted mt-2">Pendientes de realizar</div>
+                <div class="small text-muted mt-3">Pendientes de realizar</div>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="admin-stat-card border-start border-success border-4">
-                <div class="d-flex justify-content-between">
+        <div class="col-md-6 col-xl-3">
+            <div class="admin-stat-card bg-white p-4 rounded-4 shadow-sm border-start border-success border-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <div class="text-muted small fw-bold">ANALÍTICAS PENDIENTES</div>
-                        <div class="fs-3 fw-bold">1</div>
+                        <div class="text-muted small fw-bold mb-1">ANALÍTICAS PENDIENTES</div>
+                        <div class="fs-2 fw-bold text-dark lh-1">@Model.AnaliticasPendientes</div>
                     </div>
-                    <i class="bi bi-clipboard-pulse fs-3 text-success"></i>
+                    <div class="p-3 bg-success bg-opacity-10 rounded-circle text-success">
+                        <i class="bi bi-clipboard-pulse fs-4"></i>
+                    </div>
                 </div>
-                <div class="small text-muted mt-2">Programadas o en progreso</div>
+                <div class="small text-muted mt-3">En estado 'Progreso'</div>
             </div>
         </div>
-
     </div>
-
 
     <!-- ACCESOS RÁPIDOS -->
-
-    <div class="bg-white rounded-4 shadow-sm p-4 mb-5">
-
-        <h6 class="fw-bold text-muted mb-3">
-            <i class="bi bi-gear-fill me-2"></i>Accesos Rápidos
+    <div class="bg-white rounded-4 shadow-sm p-4 mb-5 border-0">
+        <h6 class="fw-bold text-dark mb-3 border-bottom pb-2">
+            <i class="bi bi-grid-1x2-fill text-primary me-2"></i>Accesos Rápidos
         </h6>
-
         <div class="row g-3">
-
             <div class="col-md-3">
-                <button class="btn btn-outline-secondary w-100 p-3">
-                    <i class="bi bi-people fs-3 d-block mb-1"></i>
-                    Gestionar Usuarios
-                </button>
+                <a asp-controller="Admin" asp-action="Usuarios" class="btn btn-light border w-100 p-3 text-start hover-shadow transition-all text-decoration-none">
+                    <i class="bi bi-people fs-3 d-block mb-2 text-primary"></i>
+                    <span class="fw-bold text-dark d-block">Gestionar Usuarios</span>
+                    <small class="text-muted">Altas, bajas y roles</small>
+                </a>
             </div>
-
             <div class="col-md-3">
-                <button class="btn btn-outline-secondary w-100 p-3">
-                    <i class="bi bi-calendar fs-3 d-block mb-1"></i>
-                    Gestionar Citas
-                </button>
+                <a asp-controller="Admin" asp-action="Mediciones" class="btn btn-light border w-100 p-3 text-start hover-shadow transition-all text-decoration-none">
+                    @* <i class="bi bi-calendar3 fs-3 d-block mb-2 text-info"></i> *@
+                    <i class="bi bi-graph-up-arrow d-block text-indigo fs-3 mb-2"></i>
+                    <span class="fw-bold text-dark d-block">Gestionar Mediciones</span>
+                    <small class="text-muted">Tipos de Mediciones</small>
+                </a>
             </div>
-
             <div class="col-md-3">
-                <button class="btn btn-outline-secondary w-100 p-3">
-                    <i class="bi bi-prescription2 fs-3 d-block mb-1"></i>
-                    Medicamentos
-                </button>
+                <a asp-controller="Admin" asp-action="Medicamentos" class="btn btn-light border w-100 p-3 text-start hover-shadow transition-all text-decoration-none">
+                    <i class="bi bi-capsule fs-3 d-block mb-2 text-success"></i>
+                    <span class="fw-bold text-dark d-block">Medicamentos</span>
+                    <small class="text-muted">Catálogo y vademécum</small>
+                </a>
             </div>
-
             <div class="col-md-3">
-                <button class="btn btn-outline-secondary w-100 p-3">
-                    <i class="bi bi-tag fs-3 d-block mb-1"></i>
-                    Especialidades
-                </button>
+                <a asp-controller="Admin" asp-action="Especialidades" class="btn btn-light border w-100 p-3 text-start hover-shadow transition-all text-decoration-none">
+                    <i class="bi bi-tags fs-3 d-block mb-2 text-warning" style="color: #856404 !important;"></i>
+                    <span class="fw-bold text-dark d-block">Especialidades</span>
+                    <small class="text-muted">Departamentos médicos</small>
+                </a>
             </div>
-
         </div>
-
     </div>
 
-
-    <!-- PRÓXIMAS CITAS -->
-
-    <div class="card shadow-sm border-0 mb-5">
-
-        <div class="card-header bg-white">
-            <h6 class="fw-bold mb-0">
-                <i class="bi bi-calendar-week me-2 text-primary"></i>
-                Próximas Citas
-            </h6>
+    <div class="row g-4">
+        <div class="col-lg-12">
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+                <div class="card-header bg-white border-bottom pt-4 pb-3 px-4 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-calendar-week me-2 text-primary"></i>Próximas Citas (Visión Global)
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light small text-muted text-uppercase">
+                                <tr>
+                                    <th class="ps-4 py-3">Fecha y Hora</th>
+                                    <th class="py-3">Paciente</th>
+                                    <th class="py-3">Doctor</th>
+                                    <th class="pe-4 py-3 text-end">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.ProximasCitas != null && Model.ProximasCitas.Any())
+                                {
+                                    @foreach (var cita in Model.ProximasCitas.Take(5))
+                                    {
+                                        <tr>
+                                            <td class="ps-4 py-3 fw-bold text-dark">@cita.FechaHora.ToString("dd MMM yyyy - HH:mm")</td>
+                                            <td class="py-3">
+                                                <div class="fw-medium text-dark">@(cita.Paciente?.Nombre) @(cita.Paciente?.Apellido1)</div>
+                                            </td>
+                                            <td class="py-3 text-muted">
+                                                Dr/a. @(cita.Doctor?.Nombre) @(cita.Doctor?.Apellido1)
+                                            </td>
+                                            <td class="pe-4 py-3 text-end">
+                                                <span class="badge bg-warning bg-opacity-10 text-dark border border-warning rounded-pill px-2">Programada</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-muted">No hay citas programadas próximamente.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="card-body p-0">
-
-            <table class="table table-hover mb-0">
-
-                <thead class="table-light small text-muted">
-                    <tr>
-                        <th>Paciente</th>
-                        <th>Doctor</th>
-                        <th>Motivo</th>
-                        <th>Fecha</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <tr>
-                        <td>Mario García Ramos</td>
-                        <td>Dr. Elena Martín</td>
-                        <td>Control de marcapasos</td>
-                        <td>20 Jun 2024 - 09:00</td>
-                        <td><span class="badge bg-warning text-dark">Programada</span></td>
-                    </tr>
-
-                    <tr>
-                        <td>Mario García Pérez</td>
-                        <td>Dr. Elena Martín</td>
-                        <td>Resultados analítica</td>
-                        <td>25 Jun 2024 - 12:00</td>
-                        <td><span class="badge bg-warning text-dark">Programada</span></td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
     </div>
-
-
-    <!-- ACTIVIDAD RECIENTE -->
-
-    <div class="card border-0 shadow-sm">
-
-        <div class="card-header bg-white">
-            <h6 class="fw-bold mb-0">
-                <i class="bi bi-clock-history me-2 text-primary"></i>
-                Actividad reciente
-            </h6>
-        </div>
-
-        <div class="card-body">
-
-            <ul class="list-group list-group-flush">
-
-                <li class="list-group-item">
-                    <i class="bi bi-person-plus text-success me-2"></i>
-                    Nuevo paciente registrado: <b>Lucía Jiménez</b>
-                </li>
-
-                <li class="list-group-item">
-                    <i class="bi bi-capsule text-primary me-2"></i>
-                    Prescripción creada: <b>Amoxicilina</b>
-                </li>
-
-                <li class="list-group-item">
-                    <i class="bi bi-clipboard-data text-warning me-2"></i>
-                    Analítica completada para <b>Mario García</b>
-                </li>
-
-            </ul>
-
-        </div>
-
-    </div>
-
 </div>
+
+<style>
+    .hover-shadow:hover {
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        border-color: #dee2e6 !important;
+    }
+
+    .transition-all {
+        transition: all .2s ease-in-out;
+    }
+</style>

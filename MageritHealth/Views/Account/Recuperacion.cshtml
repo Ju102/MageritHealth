@@ -1,0 +1,113 @@
+﻿@{
+    Layout = "_LoginLayout";
+    ViewData["Title"] = "Recuperar Contraseña";
+
+    bool mostrarMensajeExito = ViewBag.EmailEnviado == true;
+}
+
+<div class="col-12 col-md-8 col-lg-5 col-xl-4 w-100" style="max-width: 450px;">
+
+    <div class="card auth-card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-md-5">
+
+            @if (mostrarMensajeExito)
+            {
+                <!-- ESTADO: CORREO ENVIADO (ÉXITO) -->
+                <div class="text-center mb-2 animate-fade-in">
+                    <div class="d-inline-flex justify-content-center align-items-center bg-success bg-opacity-10 rounded-circle mb-4" style="width: 80px; height: 80px;">
+                        <i class="bi bi-envelope-check-fill text-success" style="font-size: 2.5rem;"></i>
+                    </div>
+
+                    <h4 class="fw-bold text-dark mb-3 tracking-tight">Revisa tu correo</h4>
+
+                    <p class="text-muted small mb-4">
+                        Si existe una cuenta asociada a esa dirección, te hemos enviado un email con una <strong>contraseña temporal</strong> generada automáticamente.
+                    </p>
+
+                    <div class="alert bg-warning bg-opacity-10 border border-warning border-opacity-25 text-dark rounded-3 small p-3 mb-4 text-start shadow-sm">
+                        <i class="bi bi-info-circle-fill text-warning me-1"></i> No olvides revisar la carpeta de <strong>Spam o Correo no deseado</strong> si no lo recibes en unos minutos.
+                    </div>
+
+                    <div class="d-grid mt-2">
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-auth fs-5 fw-bold rounded-pill py-2 shadow-sm">
+                            Volver al inicio de sesión
+                        </a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- ESTADO: FORMULARIO DE RECUPERACIÓN -->
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex justify-content-center align-items-center bg-primary bg-opacity-10 rounded-circle mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-key text-primary" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-1 tracking-tight">Recuperar Acceso</h3>
+                    <p class="text-muted small fw-medium text-uppercase tracking-wide">Magerit Health</p>
+                </div>
+
+                <div class="alert bg-light border border-secondary border-opacity-25 text-dark rounded-3 small p-3 mb-4 text-center">
+                    <i class="bi bi-info-circle-fill text-primary me-1"></i> Introduce tu dirección de correo y te enviaremos una <strong>nueva contraseña temporal</strong> generada automáticamente.
+                </div>
+
+                @Html.AntiForgeryToken()
+                <form asp-controller="Account" asp-action="Recuperacion" method="post" class="needs-validation">
+
+                    <div asp-validation-summary="ModelOnly" class="alert bg-danger bg-opacity-10 border border-danger border-opacity-25 text-danger rounded-3 small p-3 mb-4 d-flex align-items-center shadow-sm" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                        <div></div>
+                    </div>
+
+                    <div class="form-floating mb-4">
+                        <input name="emailrecuperacion" class="form-control rounded-3" placeholder="">
+                        <label for="emailrecuperacion" class="text-muted"><i class="bi bi-envelope me-2"></i>Email asociado a tu cuenta</label>
+                    </div>
+
+                    <div class="d-grid mb-4">
+                        <button type="submit" class="btn btn-primary btn-auth fs-5 fw-bold rounded-pill py-2 shadow-sm">
+                            Restablecer Contraseña <i class="bi bi-send ms-1 fs-5 align-middle"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4">
+                    <a asp-controller="Account" asp-action="Login" class="text-decoration-none small text-muted fw-medium hover-primary">
+                        <i class="bi bi-arrow-left me-1"></i> Volver al inicio de sesión
+                    </a>
+                </div>
+            }
+
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <p class="text-muted small fw-medium opacity-75">
+            &copy; @DateTime.Now.Year Magerit Health.<br class="d-sm-none"> Todos los derechos reservados.
+        </p>
+    </div>
+</div>
+
+<style>
+    /* Pequeña animación para que la transición se vea más fluida */
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

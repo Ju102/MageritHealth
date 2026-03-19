@@ -2,7 +2,7 @@
 
 namespace MageritHealth.Models.ViewModels
 {
-    public class EditPacienteViewModel
+    public class EditUsuarioViewModel
     {
         public string Telefono { get; set; }
         public string? Password { get; set; }

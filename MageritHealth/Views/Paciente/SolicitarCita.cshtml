@@ -59,15 +59,8 @@
 
                         <div class="col-md-6">
                             <label asp-for="Hora" class="form-label fw-bold text-dark small">Tramo Horario</label>
-                            <select asp-for="Hora" class="form-select bg-light">
-                                <option selected value="">Elige hora...</option>
-                                <option value="09:00">09:00 AM</option>
-                                <option value="09:30">09:30 AM</option>
-                                <option value="10:00">10:00 AM</option>
-                                <option value="10:30">10:30 AM</option>
-                                <option value="11:00">11:00 AM</option>
-                                <option value="11:30">11:30 AM</option>
-                                <option value="12:00">12:00 PM</option>
+                            <select asp-for="Hora" class="form-select bg-light" id="selectHora" disabled>
+                                <option selected value="">Elige médico y fecha...</option>
                             </select>
                             <span asp-validation-for="Hora" class="text-danger small mt-1 d-block"></span>
                         </div>
@@ -131,6 +124,49 @@
                     selectDoctor.append('<option value="">Espera especialidad...</option>');
                 }
             });
+
+            function cargarHorasDisponibles() {
+            var doctorId = $("#selectDoctor").val();
+            var fechaSeleccionada = $("#Fecha").val();
+            var selectHora = $("#selectHora");
+
+            // Solo hacemos la llamada si tenemos AMBOS datos (Doctor y Fecha)
+            if (doctorId && fechaSeleccionada) {
+
+                selectHora.prop("disabled", false);
+                selectHora.empty();
+                selectHora.append('<option value="">Buscando huecos libres...</option>');
+
+                // Llamada AJAX a nuestro nuevo método
+                $.getJSON('@Url.Action("GetHorasDisponibles", "Paciente")', { idDoctor: doctorId, fecha: fechaSeleccionada }, function (data) {
+
+                    selectHora.empty();
+
+                    if (data.length > 0) {
+                        selectHora.append('<option value="">-- Selecciona hora --</option>');
+                        // Llenar el select con las horas devueltas
+                        $.each(data, function (index, item) {
+                            selectHora.append('<option value="' + item + '">' + item + '</option>');
+                        });
+                    } else {
+                        // Si el array viene vacío, es que el médico está lleno ese día
+                        selectHora.append('<option value="">No hay citas disponibles este día</option>');
+                        selectHora.prop("disabled", true);
+                    }
+                });
+            } else {
+                // Si falta fecha o doctor, bloqueamos el select de hora
+                selectHora.empty();
+                selectHora.append('<option value="">Elige médico y fecha...</option>');
+                selectHora.prop("disabled", true);
+            }
+        }
+
+        // Ejecutar la función cuando el paciente cambie el DOCTOR
+        $("#selectDoctor").change(cargarHorasDisponibles);
+
+        // Ejecutar la función cuando el paciente cambie la FECHA
+        $("#Fecha").change(cargarHorasDisponibles);
         });
     </script>
 }

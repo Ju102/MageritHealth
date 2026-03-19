@@ -1,4 +1,7 @@
-﻿@{
+﻿@using MageritHealth.Models.ViewModels
+@model DoctorAgendaViewModel
+
+@{
     Layout = "_DoctorLayout";
     ViewData["Title"] = "Mi Agenda";
 }
@@ -10,14 +13,8 @@
             <p class="text-muted small">Gestiona y revisa tus consultas programadas.</p>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-outline-secondary bg-white shadow-sm rounded-3 px-3 py-2" title="Día anterior">
-                <i class="bi bi-chevron-left"></i>
-            </button>
-            <button class="btn btn-primary fw-bold shadow-sm rounded-3 px-4 py-2">
-                <i class="bi bi-calendar-event me-2"></i>Hoy: 17 Mar 2026
-            </button>
-            <button class="btn btn-outline-secondary bg-white shadow-sm rounded-3 px-3 py-2" title="Día siguiente">
-                <i class="bi bi-chevron-right"></i>
+            <button class="btn btn-primary fw-bold shadow-sm rounded-3 px-4 py-2" disabled>
+                <i class="bi bi-calendar-event me-2"></i>Hoy, @Model.FechaDada.ToString("dd MMM")
             </button>
         </div>
     </div>
@@ -25,128 +22,163 @@
     <div class="row g-4">
         <div class="col-lg-8">
 
-            <div class="doctor-card p-3 mb-4 shadow-sm border-0 d-flex flex-wrap gap-2 align-items-center bg-white">
-                <span class="fw-bold text-muted small me-2"><i class="bi bi-funnel me-1"></i> Filtros:</span>
-                <button class="btn btn-sm btn-dark rounded-pill px-3">Todas</button>
-                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3">Pendientes</button>
-                <button class="btn btn-sm btn-outline-success rounded-pill px-3">Completadas</button>
-                <div class="ms-auto input-group" style="max-width: 250px;">
-                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search small"></i></span>
-                    <input type="text" class="form-control form-control-sm bg-light border-start-0 ps-0" placeholder="Buscar paciente...">
-                </div>
-            </div>
+            @if (Model.Citas != null && Model.Citas.Any())
+            {
+                bool hayCitaEnCurso = Model.Citas.Any(c => c.Estado.Equals("Progreso", StringComparison.OrdinalIgnoreCase) || c.Estado.Equals("En Curso", StringComparison.OrdinalIgnoreCase));
 
-            <div class="d-flex mb-3">
-                <div class="text-end me-3 pt-3" style="min-width: 60px;">
-                    <h5 class="fw-bold text-dark mb-0">09:00</h5>
-                    <small class="text-muted">30 min</small>
-                </div>
-                <div class="doctor-card p-3 w-100 border-start border-success border-5 shadow-sm bg-white opacity-75">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div>
-                            <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill small mb-2">Completada</span>
-                            <h6 class="fw-bold text-dark mb-1">Carlos Mendoza Ruiz</h6>
-                            <p class="text-muted small mb-0"><i class="bi bi-person-badge me-1"></i>DNI: 11223344A | <i class="bi bi-clipboard-pulse ms-2 me-1"></i>Revisión de análisis</p>
+                bool primeraProgramadaEncontrada = false;
+
+                DateTime ahora = DateTime.Now;
+
+                foreach (var cita in Model.Citas.OrderBy(c => c.FechaHora))
+                {
+                    // Lógica visual basada en el estado
+                    string borderClass = "border-info";
+                    string badgeClass = "bg-info text-white";
+                    string rowOpacity = "";
+
+                    bool enCurso = cita.Estado.Equals("Progreso", StringComparison.OrdinalIgnoreCase) || cita.Estado.Equals("En Curso", StringComparison.OrdinalIgnoreCase);
+                    bool esProgramada = cita.Estado.Equals("Programada", StringComparison.OrdinalIgnoreCase);
+
+                    bool esCitaDeHoy = cita.FechaHora.Date == ahora.Date;
+
+                    DateTime horaMinimaParaIniciar = cita.FechaHora.AddMinutes(-5);
+                    bool estaEnTiempoParaIniciar = ahora >= horaMinimaParaIniciar;
+
+                    bool esSiguienteParaIniciar = esProgramada && !hayCitaEnCurso && !primeraProgramadaEncontrada && esCitaDeHoy && estaEnTiempoParaIniciar;
+
+                    if (esProgramada && !primeraProgramadaEncontrada)
+                    {
+                        primeraProgramadaEncontrada = true;
+                    }
+
+                    if (cita.Estado.Equals("Completada", StringComparison.OrdinalIgnoreCase))
+                    {
+                        borderClass = "border-success";
+                        badgeClass = "bg-success bg-opacity-10 text-success border border-success";
+                        rowOpacity = "opacity-75";
+                    }
+                    else if (cita.Estado.Equals("Cancelada", StringComparison.OrdinalIgnoreCase))
+                    {
+                        borderClass = "border-danger";
+                        badgeClass = "bg-danger bg-opacity-10 text-danger border border-danger";
+                        rowOpacity = "opacity-50";
+                    }
+                    else if (enCurso)
+                    {
+                        borderClass = "border-warning";
+                        badgeClass = "bg-warning bg-opacity-25 text-dark border border-warning animate-pulse";
+                    }
+                    else if (esProgramada && !esSiguienteParaIniciar)
+                    {
+                        borderClass = "border-info";
+                        badgeClass = "bg-info text-white";
+                    }
+
+                    <div class="d-flex mb-3 position-relative">
+
+                        @if (enCurso)
+                        {
+                            <div class="position-absolute w-100 border-top border-warning" style="top: -10px; z-index: 0; border-top-style: dashed !important;">
+                                <span class="position-absolute bg-warning text-dark fw-bold rounded-pill small px-2 py-1 shadow-sm" style="top: -12px; left: 0;">Ahora</span>
+                            </div>
+                        }
+
+                        <div class="text-end me-3 pt-3 position-relative" style="min-width: 60px; z-index: 1;">
+                            <h5 class="fw-bold @(enCurso ? "text-dark fs-4" : (cita.Estado.Equals("Cancelada", StringComparison.OrdinalIgnoreCase) ? "text-muted text-decoration-line-through" : "text-dark")) mb-0">@cita.FechaHora.ToString("HH:mm")</h5>
+                            <small class="@(enCurso ? "text-warning fw-bold" : "text-muted")">30 min</small>
                         </div>
-                        <button class="btn btn-sm btn-outline-secondary fw-bold shadow-sm"><i class="bi bi-file-earmark-medical me-1"></i>Ver Informe</button>
+
+                        <div class="doctor-card p-3 w-100 border-start @borderClass border-5 shadow-sm bg-white @rowOpacity position-relative" style="z-index: 1;">
+
+                            @if (enCurso)
+                            {
+                                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-3">
+                                    <div>
+                                        <span class="badge @badgeClass rounded-pill px-3 py-2 mb-2">
+                                            <i class="bi bi-record-circle-fill text-danger me-1"></i> En Curso
+                                        </span>
+                                        <h5 class="fw-bold text-dark mb-1">@(cita.Paciente?.Nombre) @(cita.Paciente?.Apellido1)</h5>
+                                        <p class="text-muted small mb-0"><i class="bi bi-person-badge me-1"></i>DNI: @(cita.Paciente?.Dni) | <i class="bi bi-telephone ms-2 me-1"></i>@(cita.Paciente?.Telefono)</p>
+                                    </div>
+                                    <div class="mt-3 mt-sm-0">
+                                        <a asp-controller="Doctor" asp-action="Consulta" asp-route-id="@cita.IdCita" class="btn btn-warning fw-bold text-dark shadow-sm px-4 py-2">
+                                            <i class="bi bi-play-fill me-1"></i>Continuar Consulta
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="p-3 bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded-3">
+                                    <span class="fw-bold text-dark small d-block mb-1">Motivo:</span>
+                                    <p class="text-muted small fst-italic mb-0">"@cita.Motivo"</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="d-flex justify-content-between align-items-center mb-0">
+                                    <div>
+                                        <span class="badge @badgeClass rounded-pill small mb-2">@cita.Estado.ToUpper()</span>
+                                        <h6 class="fw-bold @(cita.Estado.Equals("Cancelada", StringComparison.OrdinalIgnoreCase) ? "text-muted text-decoration-line-through" : "text-dark") mb-1">@(cita.Paciente?.Nombre) @(cita.Paciente?.Apellido1)</h6>
+                                        <p class="text-muted small mb-0"><i class="bi bi-person-badge me-1"></i>DNI: @(cita.Paciente?.Dni) @(!cita.Estado.Equals("Cancelada", StringComparison.OrdinalIgnoreCase) ? $"| {cita.Motivo}" : "")</p>
+                                    </div>
+
+                                    <div class="d-flex gap-1 justify-content-end">
+                                        @if (esProgramada)
+                                        {
+                                            @if (esSiguienteParaIniciar)
+                                            {
+                                                <button class="btn btn-sm btn-outline-danger fw-bold shadow-sm" title="Marcar paciente como ausente" data-bs-toggle="tooltip">
+                                                    <i class="bi bi-person-x"></i> Ausente
+                                                </button>
+                                                <a asp-controller="Doctor" asp-action="Consulta" asp-route-id="@cita.IdCita" class="btn btn-sm btn-info text-white fw-bold shadow-sm">
+                                                    <i class="bi bi-play-fill me-1"></i>Iniciar
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                string titleMensaje = "";
+                                                if (hayCitaEnCurso)
+                                                {
+                                                    titleMensaje = "Debes finalizar la consulta actual para iniciar esta.";
+                                                }
+                                                else if (!esCitaDeHoy)
+                                                {
+                                                    titleMensaje = "Solo puedes iniciar citas programadas para el día de hoy.";
+                                                }
+                                                else if (!estaEnTiempoParaIniciar)
+                                                {
+                                                    titleMensaje = "Podrás iniciar la consulta 5 minutos antes de la hora programada.";
+                                                }
+                                                else
+                                                {
+                                                    titleMensaje = "Debes atender la cita anterior primero.";
+                                                }
+
+                                                <button class="btn btn-sm btn-light text-muted fw-bold shadow-sm" disabled title="@titleMensaje" data-bs-toggle="tooltip">
+                                                    <i class="bi bi-lock-fill"></i>
+                                                </button>
+                                            }
+                                        }
+                                        else if (cita.Estado.Equals("Completada", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <button class="btn btn-sm btn-outline-secondary fw-bold shadow-sm"><i class="bi bi-file-earmark-medical me-1"></i>Ver Informe</button>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     </div>
+                }
+            }
+            else
+            {
+                <div class="text-center p-5 border rounded-4 bg-light text-muted">
+                    <i class="bi bi-calendar-x fs-1 opacity-50 mb-3 d-block"></i>
+                    <h5 class="fw-bold">Sin citas programadas</h5>
+                    <p class="small mb-0">No hay pacientes agendados para este día.</p>
                 </div>
-            </div>
-
-            <div class="d-flex mb-3">
-                <div class="text-end me-3 pt-3" style="min-width: 60px;">
-                    <h5 class="fw-bold text-dark mb-0">09:30</h5>
-                    <small class="text-muted">30 min</small>
-                </div>
-                <div class="doctor-card p-3 w-100 border-start border-success border-5 shadow-sm bg-white opacity-75">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div>
-                            <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill small mb-2">Completada</span>
-                            <h6 class="fw-bold text-dark mb-1">Elena Torres Blanco</h6>
-                            <p class="text-muted small mb-0"><i class="bi bi-person-badge me-1"></i>DNI: 22334455B | <i class="bi bi-clipboard-pulse ms-2 me-1"></i>Control de tensión</p>
-                        </div>
-                        <button class="btn btn-sm btn-outline-secondary fw-bold shadow-sm"><i class="bi bi-file-earmark-medical me-1"></i>Ver Informe</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="d-flex mb-3 position-relative">
-                <div class="position-absolute w-100 border-top border-primary" style="top: -10px; z-index: 0; border-top-style: dashed !important;">
-                    <span class="position-absolute bg-primary text-white rounded-pill small px-2 py-1" style="top: -12px; left: 0;">Ahora</span>
-                </div>
-
-                <div class="text-end me-3 pt-3 position-relative" style="min-width: 60px; z-index: 1;">
-                    <h5 class="fw-bold text-primary mb-0">10:00</h5>
-                    <small class="text-primary fw-bold">30 min</small>
-                </div>
-                <div class="doctor-card p-4 w-100 border-start border-primary border-5 shadow bg-white position-relative" style="z-index: 1;">
-                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-3">
-                        <div>
-                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary rounded-pill px-3 py-2 mb-2 animate-pulse">
-                                <i class="bi bi-record-circle-fill me-1"></i> En Curso
-                            </span>
-                            <h5 class="fw-bold text-dark mb-1">María Díaz Martín</h5>
-                            <p class="text-muted small mb-0"><i class="bi bi-person-badge me-1"></i>DNI: 44444444D | <i class="bi bi-telephone ms-2 me-1"></i>600 777 888</p>
-                        </div>
-                        <div class="mt-3 mt-sm-0">
-                            <a href="#" class="btn btn-primary fw-bold shadow-sm px-4 py-2"><i class="bi bi-play-fill me-1"></i>Continuar Consulta</a>
-                        </div>
-                    </div>
-                    <div class="p-3 bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded-3">
-                        <span class="fw-bold text-dark small d-block mb-1">Motivo:</span>
-                        <p class="text-muted small fst-italic mb-0">"Dolor leve en el pecho y episodios de estrés."</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="d-flex mb-3">
-                <div class="text-end me-3 pt-3" style="min-width: 60px;">
-                    <h5 class="fw-bold text-dark mb-0">10:30</h5>
-                    <small class="text-muted">30 min</small>
-                </div>
-                <div class="doctor-card p-3 w-100 border-start border-info border-5 shadow-sm bg-white">
-                    <div class="d-flex justify-content-between align-items-center mb-0">
-                        <div>
-                            <span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill small mb-2">Programada (Sala de espera)</span>
-                            <h6 class="fw-bold text-dark mb-1">Javier López Fernández</h6>
-                            <p class="text-muted small mb-0"><i class="bi bi-person-badge me-1"></i>DNI: 55667788C | <i class="bi bi-clipboard-pulse ms-2 me-1"></i>Primera visita</p>
-                        </div>
-                        <div>
-                            <button class="btn btn-sm btn-outline-info fw-bold shadow-sm me-2" title="Ver Ficha Previa"><i class="bi bi-eye"></i></button>
-                            <button class="btn btn-sm btn-info text-white fw-bold shadow-sm">Llamar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="d-flex mb-3">
-                <div class="text-end me-3 pt-3" style="min-width: 60px;">
-                    <h5 class="fw-bold text-secondary mb-0">11:00</h5>
-                    <small class="text-muted">30 min</small>
-                </div>
-                <div class="doctor-card p-3 w-100 border-start border-secondary border-5 shadow-sm bg-light text-center">
-                    <div class="text-muted fw-bold"><i class="bi bi-cup-hot-fill me-2"></i> Descanso / Tareas Administrativas</div>
-                </div>
-            </div>
-
-            <div class="d-flex mb-3">
-                <div class="text-end me-3 pt-3" style="min-width: 60px;">
-                    <h5 class="fw-bold text-muted text-decoration-line-through mb-0">11:30</h5>
-                    <small class="text-muted">30 min</small>
-                </div>
-                <div class="doctor-card p-3 w-100 border-start border-danger border-5 shadow-sm bg-white opacity-50">
-                    <div class="d-flex justify-content-between align-items-center mb-0">
-                        <div>
-                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill small mb-2">Cancelada por el paciente</span>
-                            <h6 class="fw-bold text-muted text-decoration-line-through mb-1">Sofía Ramírez Vega</h6>
-                            <p class="text-muted small mb-0"><i class="bi bi-person-badge me-1"></i>DNI: 99887766Z</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            }
 
         </div>
-
         <div class="col-lg-4">
 
             <div class="doctor-card p-4 shadow-sm border-0 mb-4 bg-white">
@@ -154,79 +186,85 @@
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="text-muted fw-bold small">Total Citas:</span>
-                    <span class="badge bg-dark rounded-pill fs-6 px-3">8</span>
+                    <span class="badge bg-dark rounded-pill fs-6 px-3">@Model.TotalCitas</span>
                 </div>
 
                 <div class="progress mb-4" style="height: 10px;">
-                    <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="2" aria-valuemin="0" aria-valuemax="8" title="Completadas: 2"></div>
-                    <div class="progress-bar bg-primary" role="progressbar" style="width: 12.5%" aria-valuenow="1" aria-valuemin="0" aria-valuemax="8" title="En curso: 1"></div>
-                    <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="4" aria-valuemin="0" aria-valuemax="8" title="Pendientes: 4"></div>
-                    <div class="progress-bar bg-danger" role="progressbar" style="width: 12.5%" aria-valuenow="1" aria-valuemin="0" aria-valuemax="8" title="Canceladas: 1"></div>
+                    <div class="progress-bar bg-success" role="progressbar" style="width: @Model.PorcentajeCompletadas" title="Completadas: @Model.CitasCompletadas"></div>
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: @Model.PorcentajeEnCurso" title="En curso: @Model.CitasEnCurso"></div>
+                    <div class="progress-bar bg-info" role="progressbar" style="width: @Model.PorcentajePendientes" title="Pendientes: @Model.CitasPendientes"></div>
+                    <div class="progress-bar bg-danger" role="progressbar" style="width: @Model.PorcentajeCanceladas" title="Canceladas: @Model.CitasCanceladas"></div>
                 </div>
 
                 <ul class="list-unstyled small mb-0">
-                    <li class="mb-2 d-flex justify-content-between"><span class="text-success fw-bold"><i class="bi bi-circle-fill me-2" style="font-size: 0.5rem;"></i>Completadas</span> <span>2</span></li>
-                    <li class="mb-2 d-flex justify-content-between"><span class="text-primary fw-bold"><i class="bi bi-circle-fill me-2" style="font-size: 0.5rem;"></i>En Curso</span> <span>1</span></li>
-                    <li class="mb-2 d-flex justify-content-between"><span class="text-info fw-bold"><i class="bi bi-circle-fill me-2" style="font-size: 0.5rem;"></i>Pendientes</span> <span>4</span></li>
-                    <li class="d-flex justify-content-between"><span class="text-danger fw-bold"><i class="bi bi-circle-fill me-2" style="font-size: 0.5rem;"></i>Canceladas</span> <span>1</span></li>
+                    <li class="mb-2 d-flex justify-content-between"><span class="text-success fw-bold"><i class="bi bi-circle-fill me-2" style="font-size: 0.5rem;"></i>Completadas</span> <span>@Model.CitasCompletadas</span></li>
+                    <li class="mb-2 d-flex justify-content-between"><span class="text-warning fw-bold"><i class="bi bi-circle-fill me-2" style="font-size: 0.5rem;"></i>En Curso</span> <span>@Model.CitasEnCurso</span></li>
+                    <li class="mb-2 d-flex justify-content-between"><span class="text-info fw-bold"><i class="bi bi-circle-fill me-2" style="font-size: 0.5rem;"></i>Pendientes</span> <span>@Model.CitasPendientes</span></li>
+                    <li class="d-flex justify-content-between"><span class="text-danger fw-bold"><i class="bi bi-circle-fill me-2" style="font-size: 0.5rem;"></i>Canceladas</span> <span>@Model.CitasCanceladas</span></li>
                 </ul>
             </div>
-
+            <!-- CALENDARIO ESTÁTICO (MES ACTUAL) -->
             <div class="doctor-card p-4 shadow-sm border-0 bg-white">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold text-dark mb-0">Marzo 2026</h6>
-                    <div>
-                        <button class="btn btn-sm btn-link text-muted p-0 me-2"><i class="bi bi-chevron-left"></i></button>
-                        <button class="btn btn-sm btn-link text-muted p-0"><i class="bi bi-chevron-right"></i></button>
-                    </div>
+                @{
+                    // Lógica estática basada en el mes actual
+                    DateTime mesActual = DateTime.Now;
+                    DateTime primerDiaDelMes = new DateTime(mesActual.Year, mesActual.Month, 1);
+                    int diasEnElMes = DateTime.DaysInMonth(mesActual.Year, mesActual.Month);
+
+                    // En C#, DayOfWeek.Sunday es 0. Transformamos para que Lunes sea 0 y Domingo 6.
+                    int huecosEnBlanco = ((int)primerDiaDelMes.DayOfWeek + 6) % 7;
+                }
+
+                <div class="d-flex justify-content-center align-items-center mb-3 pb-2 border-bottom">
+                    <h6 class="fw-bold text-dark mb-0 text-capitalize">
+                        @mesActual.ToString("MMMM yyyy", new System.Globalization.CultureInfo("es-ES"))
+                    </h6>
                 </div>
 
+                <!-- Cabecera de días (L M X J V S D) -->
                 <div class="d-grid text-center small fw-bold text-muted mb-2" style="grid-template-columns: repeat(7, 1fr);">
                     <div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div><div>D</div>
                 </div>
 
                 <div class="d-grid text-center small" style="grid-template-columns: repeat(7, 1fr); gap: 5px;">
-                    <div class="text-muted opacity-25 p-1"></div>
-                    <div class="text-muted opacity-25 p-1"></div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">1</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">2</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">3</div>
-                    <div class="p-1 rounded text-muted">4</div>
-                    <div class="p-1 rounded text-muted">5</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">6</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">7</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">8</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">9</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">10</div>
-                    <div class="p-1 rounded text-muted">11</div>
-                    <div class="p-1 rounded text-muted">12</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">13</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">14</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">15</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">16</div>
-                    <div class="p-1 rounded bg-primary text-white fw-bold shadow-sm">17</div> <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">18</div>
-                    <div class="p-1 rounded text-muted">19</div>
-                    <div class="p-1 rounded text-muted">20</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">21</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">22</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">23</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">24</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">25</div>
-                    <div class="p-1 rounded text-muted">26</div>
-                    <div class="p-1 rounded text-muted">27</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">28</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">29</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">30</div>
-                    <div class="p-1 rounded text-dark hover-bg-light cursor-pointer">31</div>
+
+                    @for (int i = 0; i < huecosEnBlanco; i++)
+                    {
+                        <div class="text-muted opacity-25 p-1"></div>
+                    }
+
+                    @for (int dia = 1; dia <= diasEnElMes; dia++)
+                    {
+                        DateTime fechaBucle = new DateTime(mesActual.Year, mesActual.Month, dia);
+                        bool esFechaDadaSeleccionada = fechaBucle.Date == Model.FechaDada.Date;
+                        bool esFinDeSemana = fechaBucle.DayOfWeek == DayOfWeek.Saturday || fechaBucle.DayOfWeek == DayOfWeek.Sunday;
+
+                        if (esFechaDadaSeleccionada)
+                        {
+                            <a class="p-1 rounded bg-primary text-white fw-bold shadow-sm text-decoration-none d-block">
+                                @dia
+                            </a>
+                        }
+                        else if (esFinDeSemana)
+                        {
+                            <a class="p-1 rounded text-muted text-decoration-none d-block" style="background-color: #f8f9fa;">
+                                @dia
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="p-1 rounded text-muted text-decoration-none d-block">
+                                @dia
+                            </a>
+                        }
+                    }
                 </div>
             </div>
-
         </div>
     </div>
 </div>
 
 <style>
-    /* Clases de utilidad para el mini-calendario */
     .hover-bg-light:hover {
         background-color: #f8f9fa;
     }
@@ -235,7 +273,6 @@
         cursor: pointer;
     }
 
-    /* Animación sutil para el indicador "En Curso" */
     @@keyframes pulse-opacity {
         0% {
             opacity: 1;
@@ -254,3 +291,14 @@
         animation: pulse-opacity 2s infinite;
     }
 </style>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+}

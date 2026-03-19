@@ -1,0 +1,213 @@
+﻿@model Usuario
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Perfil de Usuario";
+
+    List<Especialidad> especialidades = ViewData["especialidades"] as List<Especialidad> ?? new List<Especialidad>();
+}
+
+<div class="container mb-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div class="d-flex align-items-center">
+            <div class="avatar-huge bg-primary bg-opacity-10 text-primary me-3">
+                @(Model.Nombre[0])@(Model.Apellido1[0])
+            </div>
+            <div>
+                <h3 class="fw-bold text-dark mb-0">@Model.Nombre @Model.Apellido1 @Model.Apellido2</h3>
+                <span class="badge @(Model.Activo ? "bg-success" : "bg-danger") rounded-pill">
+                    @(Model.Activo ? "Usuario Activo" : "Usuario Desactivado")
+                </span>
+                <span class="text-muted ms-2 small">Miembro desde @Model.FechaCreacion.ToString("MMM yyyy")</span>
+            </div>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a asp-controller="Admin" asp-action="Usuarios" class="btn btn-light fw-bold border shadow-sm px-3">
+                <i class="bi bi-arrow-left me-2"></i>Volver al Listado
+            </a>
+            @if (Model.Activo)
+            {
+                <button type="button" class="btn btn-outline-danger fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalDesactivar">
+                    <i class="bi bi-person-x-fill me-2"></i>Desactivar Usuario
+                </button>
+            }
+        </div>
+    </div>
+
+    <form asp-action="EditarUsuario" method="post">
+        <input type="hidden" asp-for="IdUsuario" />
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="card-header bg-white pt-4 px-4 border-0">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-person-lines-fill me-2 text-primary"></i>Datos Personales</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">Nombre</label>
+                                <input asp-for="Nombre" class="form-control rounded-3" required />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">Primer Apellido</label>
+                                <input asp-for="Apellido1" class="form-control rounded-3" required />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">Segundo Apellido</label>
+                                <input asp-for="Apellido2" class="form-control rounded-3" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">DNI / Identificación</label>
+                                <input asp-for="Dni" class="form-control rounded-3" required />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">Fecha Nacimiento</label>
+                                <input asp-for="FechaNacimiento" type="date" class="form-control rounded-3" required
+                                       value="@Model.FechaNacimiento.ToString("yyyy-MM-dd")" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">Género</label>
+                                <select asp-for="Genero" class="form-select rounded-3">
+                                    <option value="masculino">Masculino</option>
+                                    <option value="femenino">Femenino</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">Teléfono</label>
+                                <input asp-for="Telefono" class="form-control rounded-3" required />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-muted">Dirección Completa</label>
+                                <input asp-for="Direccion" class="form-control rounded-3" required />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-header bg-white pt-4 px-4 border-0">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-hospital me-2 text-info"></i>Información de @Model.Rol
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            @if (Model.Rol.ToLower() == "doctor")
+                            {
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted">Nº Colegiado</label>
+                                    <input asp-for="NumeroColegiado" class="form-control rounded-3" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted">Especialidad</label>
+                                    <select asp-for="IdEspecialidad" class="form-select rounded-3">
+                                        @foreach (Especialidad esp in especialidades)
+                                        {
+                                            <option value="@esp.IdEspecialidad">
+                                                @esp.NombreEspecialidad
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                            }
+                            else if (Model.Rol.ToLower() == "paciente")
+                            {
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted">Nº Seguridad Social / Asegurado</label>
+                                    <input asp-for="NumeroAsegurado" class="form-control rounded-3" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted">Información Clínica</label>
+                                    <div class="p-2 border rounded bg-light small">
+                                        Acceso a @(Model.CitasComoPaciente?.Count ?? 0) citas y @(Model.Antecedentes?.Count ?? 0) antecedentes.
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="card-header bg-white pt-4 px-4 border-0">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-shield-lock me-2 text-warning"></i>Acceso y Seguridad</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Correo Electrónico</label>
+                            <input asp-for="Email" type="email" class="form-control rounded-3" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Contraseña</label>
+                            <div class="input-group">
+                                <input asp-for="Pass" type="password" class="form-control border-end-0 rounded-start-3" required />
+                                <span class="input-group-text bg-white border-start-0 rounded-end-3">
+                                    <i class="bi bi-eye text-muted"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted">Rol del Sistema</label>
+                            <input asp-for="Rol" class="form-control rounded-3 bg-light" readonly />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-3 shadow-sm rounded-3">
+                            <i class="bi bi-save2 me-2"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal fade" id="modalDesactivar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-body p-5 text-center">
+                <div class="text-danger mb-4">
+                    <i class="bi bi-person-x-fill" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="fw-bold text-dark">¿Desactivar acceso?</h4>
+                <p class="text-muted">El usuario <strong>@Model.Nombre @Model.Apellido1</strong> no podrá volver a iniciar sesión, pero sus datos clínicos se conservarán por motivos legales.</p>
+                <form asp-action="DesactivarUsuario" method="post">
+                    <input type="hidden" name="id" value="@Model.IdUsuario" />
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="button" class="btn btn-light w-100 fw-bold border" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger w-100 fw-bold">Sí, Desactivar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-huge {
+        width: 70px;
+        height: 70px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.5rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+    }
+
+    .breadcrumb-item a {
+        text-decoration: none;
+        color: #6c757d;
+    }
+
+    .breadcrumb-item.active {
+        color: #0d6efd;
+        font-weight: 600;
+    }
+</style>

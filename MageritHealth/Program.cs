@@ -1,6 +1,8 @@
 using MageritHealth.Data;
 using MageritHealth.Repositories;
 using MageritHealth.Repositories.Interfaces;
+using MageritHealth.Services;
+using MageritHealth.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,14 +20,17 @@ builder.Services.AddDbContext<MageritHealthDbContext>(options =>
     options.UseSqlServer(connectionString);
 });
 
-builder.Services.AddScoped<IUsuariosRepository, UsuariosRepository>(); // usuarios, especialidades y credenciales
-builder.Services.AddScoped<ICitasRepository, CitasRepository>(); // citas
+builder.Services.AddTransient<IUsuariosRepository, UsuariosRepository>(); // usuarios, especialidades y credenciales
+builder.Services.AddTransient<ICitasRepository, CitasRepository>(); // citas
 
-builder.Services.AddScoped<IPrescripcionesRepository, PrescripcionesRepository>(); // prescripciones y medicamentos
+builder.Services.AddTransient<IPrescripcionesRepository, PrescripcionesRepository>(); // prescripciones y medicamentos
 
-builder.Services.AddScoped<IAnaliticasRepository, AnaliticasRepository>(); // analiticas, mediciones y tipos_mediciones
+builder.Services.AddTransient<IAnaliticasRepository, AnaliticasRepository>(); // analiticas, mediciones y tipos_mediciones
 
-builder.Services.AddScoped<IInfoClinicaRepository, InfoClinicaRepository>(); // info_clinica y antecedentes
+builder.Services.AddTransient<IInfoClinicaRepository, InfoClinicaRepository>(); // info_clinica y antecedentes
+
+builder.Services.AddTransient<IEmailingService, EmailingService>();
+builder.Services.AddScoped<IExportService, ExportService>();
 
 builder.Services.AddMemoryCache();
 builder.Services.AddDistributedMemoryCache();

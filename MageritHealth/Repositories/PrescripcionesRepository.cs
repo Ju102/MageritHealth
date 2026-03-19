@@ -14,6 +14,14 @@ namespace MageritHealth.Repositories
             this.context = context;
         }
 
+        /* VIEWS: Paciente-Dashboard, Paciente-Tratamientos */
+        public async Task<List<Prescripcion>> GetListaPrescripcionesByIdPacienteAsync(int idPaciente)
+        {
+            return await this.context.Prescripciones.Include(p => p.Medicamento)
+                .Where(p => p.Cita.IdPaciente == idPaciente).Include(p => p.Medicamento)
+                .ToListAsync();
+        }        
+
         public async Task DeleteLogicoMedicamentoAsync(int idMedicamento)
         {
             Medicamento medicamento = await this.context.Medicamentos.FirstOrDefaultAsync(m => m.IdMedicamento == idMedicamento);
@@ -36,7 +44,7 @@ namespace MageritHealth.Repositories
 
         public async Task<List<Medicamento>> GetListaMedicamentosAsync()
         {
-            return await this.context.Medicamentos.Where(m => m.Activo).ToListAsync();
+            return await this.context.Medicamentos.Include(m => m.Prescripciones).Where(m => m.Activo).ToListAsync();
         }
 
         public async Task<List<Medicamento>> GetListaMedicamentosBySearch(string nombre)
@@ -47,15 +55,19 @@ namespace MageritHealth.Repositories
         public async Task<List<Prescripcion>> GetListaPrescripcionesByIdCitaAsync(int idCita)
         {
             return await this.context.Prescripciones
-                .Where(p => p.IdCita == idCita && p.Activa)
+                .Include(p => p.Medicamento)
+                .Include(p => p.Cita)
+                    .ThenInclude(c => c.Paciente)
+                .Include(p => p.Cita)
+                    .ThenInclude(c => c.Doctor)
+                        .ThenInclude(d => d.Especialidad)
+                .Where(p => p.IdCita == idCita)
                 .ToListAsync();
         }
 
-        public async Task<List<Prescripcion>> GetListaPrescripcionesByIdPacienteAsync(int idPaciente)
+        public async Task<List<Prescripcion>> GetListaPrescripcionesHoyByIdDoctorAsync(int idDoctor)
         {
-            return await this.context.Prescripciones
-                .Where(p => p.Cita.IdPaciente == idPaciente && p.Activa).Include(p => p.Medicamento)
-                .ToListAsync();
+            return await this.context.Prescripciones.Include(c => c.Cita).Where(p => p.Cita.IdDoctor == idDoctor && p.Activa && p.FechaCreacion.Date == DateTime.Today).ToListAsync();
         }
 
         public async Task<Prescripcion> GetPrescripcionByIdAsync(int idPrescripcion)
@@ -63,10 +75,12 @@ namespace MageritHealth.Repositories
             return await this.context.Prescripciones.FirstOrDefaultAsync(p => p.IdPrescripcion == idPrescripcion);
         }
 
-        public async Task InsertMedicamento(Medicamento medicamento)
+        public async Task InsertMedicamentoAsync(Medicamento medicamento)
         {
             int maxId = await this.context.Medicamentos.MaxAsync(m => (int?)m.IdMedicamento) ?? 0;
             medicamento.IdMedicamento = maxId + 1;
+            medicamento.FechaCreacion = DateTime.Now;
+            medicamento.Activo = true;
 
             await this.context.Medicamentos.AddAsync(medicamento);
             await this.context.SaveChangesAsync();

@@ -17,51 +17,76 @@ namespace MageritHealth.Repositories
 
         public async Task<Usuario> LoginUsuarioAsync(string email, string password)
         {
-            Usuario user = await this.context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
+            Usuario user = await this.context.Usuarios.Include(u => u.Especialidad).FirstOrDefaultAsync(u => u.Email == email);
 
             if (user == null || !user.Activo)
             {
                 return null;
             }
 
-            if (user.Pass != password)
-            {
-                return null;
-            } else
-            {
-                return user;
-            }
-
-            //Credencial credencial = await this.context.Credenciales.FirstOrDefaultAsync(c => c.IdUsuario == user.IdUsuario);
-
-            //if (credencial == null)
+            //if (user.Pass != password)
             //{
             //    return null;
-            //}
-
-            //byte[] hashedPassword = CryptographyHelper.EncryptPassword(password, credencial.Salt);
-
-            //if (ToolsHelper.CompareArrays(hashedPassword, credencial.PasswordHash))
-            //{
-            //    return user;
             //}
             //else
             //{
-            //    return null;
+            //    return user;
             //}
+
+            Credencial credencial = await this.context.Credenciales.FirstOrDefaultAsync(c => c.IdUsuario == user.IdUsuario);
+
+            if (credencial == null)
+            {
+                return null;
+            }
+
+            byte[] hashedPassword = CryptographyHelper.EncryptPassword(password, credencial.Salt);
+
+            if (ToolsHelper.CompareArrays(hashedPassword, credencial.PasswordHash))
+            {
+                return user;
+            }
+            else
+            {
+                return null;
+            }
 
         }
 
         public async Task<Usuario> GetUsuarioByIdAsync(int id)
         {
             return await this.context.Usuarios
-                .Include(u => u.Especialidad) // Carga la especialidad (si la tiene)
+                .Include(u => u.Especialidad).Include(u => u.CitasComoDoctor).Include(u => u.CitasComoPaciente).Include(u => u.Antecedentes)
                 .FirstOrDefaultAsync(u => u.IdUsuario == id);
+        }
+
+        public async Task<List<Usuario>> GetUsuariosByDniYRolAsync(string dni, string rol)
+        {
+            var query = this.context.Usuarios
+                .Include(u => u.Especialidad)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(dni))
+            {
+                query = query.Where(u => u.Dni.Contains(dni));
+            }
+
+            if (!string.IsNullOrWhiteSpace(rol))
+            {
+                query = query.Where(u => u.Rol == rol);
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task<List<Usuario>> GetListaUsuariosByRolAsync(string rol)
         {
             return await this.context.Usuarios.Where(u => u.Rol == rol && u.Activo).ToListAsync();
+        }
+
+        public async Task<int> GetRecuentoUsuariosByRolAsync(string rol)
+        {
+            return await this.context.Usuarios.CountAsync(u => u.Rol == rol && u.Activo);
         }
 
         public async Task<List<Usuario>> GetListaPacientesByIdDoctorAsync(int idDoctor) // en el futuro cambiara
@@ -157,6 +182,11 @@ namespace MageritHealth.Repositories
 
             if (credencial != null)
             {
+                /* TEMPORAL */
+                Usuario usuario = await this.context.Usuarios.FirstOrDefaultAsync(u => u.IdUsuario == idUsuario);
+                usuario.Pass = newPassword;
+                /* TEMPORAL */
+
                 string salt = ToolsHelper.GenerateSalt();
                 byte[] hashedPassword = CryptographyHelper.EncryptPassword(newPassword, salt);
                 credencial.PasswordHash = hashedPassword;
@@ -189,7 +219,7 @@ namespace MageritHealth.Repositories
 
         public async Task<List<Especialidad>> GetListaEspecialidadesAsync()
         {
-            return await this.context.Especialidades.ToListAsync();
+            return await this.context.Especialidades.Include(e => e.Doctores).ToListAsync();
         }
 
         public async Task<Especialidad> GetEspecialidadByIdAsync(int idEspecialidad)
@@ -221,6 +251,11 @@ namespace MageritHealth.Repositories
                 this.context.Especialidades.Remove(especialidad);
                 await this.context.SaveChangesAsync();
             }
+        }
+
+        public async Task<Usuario> GetUsuarioByEmailAsync(string email)
+        {
+            return await this.context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
         }
     }
 }

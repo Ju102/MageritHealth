@@ -10,9 +10,9 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h3 class="fw-bold text-dark mb-0">Alta de Nuevo Paciente</h3>
-            <p class="text-muted small">Registro en el sistema clínico (Email autogenerado).</p>
+            <p class="text-muted small">Registro en el sistema clínico (El email se generará automáticamente).</p>
         </div>
-        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-secondary fw-bold">
+        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-secondary fw-bold shadow-sm">
             <i class="bi bi-arrow-left me-2"></i>Volver al Panel
         </a>
     </div>
@@ -24,39 +24,39 @@
 
                 <div asp-validation-summary="ModelOnly" class="alert bg-white border border-danger border-2 text-danger rounded-3 shadow-sm login-validation-summary mb-4" role="alert"></div>
 
-                <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">
-                    <i class="bi bi-person-lines-fill me-2"></i>Datos Personales
+                <h6 class="fw-bold text-success mb-3 border-bottom pb-2">
+                    <i class="bi bi-person-vcard me-2"></i>Datos Personales y de Contacto
                 </h6>
 
                 <div class="row g-3 mb-4">
                     <div class="col-md-4">
-                        <label asp-for="Nombre" class="form-label small fw-bold text-muted">Nombre <span class="text-danger">*</span></label>
-                        <input asp-for="Nombre" class="form-control" placeholder="Ej: Juan" />
+                        <label asp-for="Nombre" class="form-label small fw-bold text-muted">Nombre *</label>
+                        <input asp-for="Nombre" class="form-control" />
                         <span asp-validation-for="Nombre" class="text-danger small"></span>
                     </div>
                     <div class="col-md-4">
-                        <label asp-for="Apellido1" class="form-label small fw-bold text-muted">Primer Apellido <span class="text-danger">*</span></label>
+                        <label asp-for="Apellido1" class="form-label small fw-bold text-muted">Primer Apellido *</label>
                         <input asp-for="Apellido1" class="form-control" />
                         <span asp-validation-for="Apellido1" class="text-danger small"></span>
                     </div>
                     <div class="col-md-4">
-                        <label asp-for="Apellido2" class="form-label small fw-bold text-muted">Segundo Apellido</label>
+                        <label asp-for="Apellido2" class="form-label small fw-bold text-muted">Segundo Apellido (opcional)</label>
                         <input asp-for="Apellido2" class="form-control" />
                         <span asp-validation-for="Apellido2" class="text-danger small"></span>
                     </div>
 
                     <div class="col-md-3">
-                        <label asp-for="Dni" class="form-label small fw-bold text-muted">DNI / Pasaporte <span class="text-danger">*</span></label>
+                        <label asp-for="Dni" class="form-label small fw-bold text-muted">DNI / NIE *</label>
                         <input asp-for="Dni" class="form-control" />
                         <span asp-validation-for="Dni" class="text-danger small"></span>
                     </div>
                     <div class="col-md-3">
-                        <label asp-for="FechaNacimiento" class="form-label small fw-bold text-muted">Fecha Nacimiento <span class="text-danger">*</span></label>
+                        <label asp-for="FechaNacimiento" class="form-label small fw-bold text-muted">Fecha Nacimiento *</label>
                         <input asp-for="FechaNacimiento" type="date" class="form-control" />
                         <span asp-validation-for="FechaNacimiento" class="text-danger small"></span>
                     </div>
                     <div class="col-md-3">
-                        <label asp-for="Genero" class="form-label small fw-bold text-muted">Género <span class="text-danger">*</span></label>
+                        <label asp-for="Genero" class="form-label small fw-bold text-muted">Género *</label>
                         <select asp-for="Genero" class="form-select">
                             <option value="">Seleccionar...</option>
                             <option value="masculino">Masculino</option>
@@ -66,32 +66,33 @@
                         <span asp-validation-for="Genero" class="text-danger small"></span>
                     </div>
                     <div class="col-md-3">
-                        <label asp-for="Telefono" class="form-label small fw-bold text-muted">Teléfono <span class="text-danger">*</span></label>
-                        <input asp-for="Telefono" class="form-control" placeholder="Ej: 600123456" />
+                        <label asp-for="Telefono" class="form-label small fw-bold text-muted">Teléfono *</label>
+                        <input asp-for="Telefono" class="form-control" />
                         <span asp-validation-for="Telefono" class="text-danger small"></span>
                     </div>
 
                     <div class="col-12">
-                        <label asp-for="Direccion" class="form-label small fw-bold text-muted">Dirección Completa <span class="text-danger">*</span></label>
-                        <input asp-for="Direccion" class="form-control" placeholder="Calle, Número, Piso, Ciudad..." />
+                        <label asp-for="Direccion" class="form-label small fw-bold text-muted">Dirección Completa *</label>
+                        <input asp-for="Direccion" class="form-control" placeholder="Calle, Número, Piso, CP, Ciudad" />
                         <span asp-validation-for="Direccion" class="text-danger small"></span>
                     </div>
                 </div>
 
                 <h6 class="fw-bold text-success mb-3 border-bottom pb-2 mt-4">
-                    <i class="bi bi-file-medical-fill me-2"></i>Datos Médicos
+                    <i class="bi bi-shield-plus me-2"></i>Datos de Seguro Médico
                 </h6>
 
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
-                        <label asp-for="NumeroAsegurado" class="form-label small fw-bold text-muted">Nº de Asegurado <span class="text-danger">*</span></label>
-                        <input asp-for="NumeroAsegurado" class="form-control border-success border-opacity-50" placeholder="Ej: ASEG-001" />
+                        <label asp-for="NumeroAsegurado" class="form-label small fw-bold text-muted">Número de Asegurado / Póliza <span class="text-danger">*</span></label>
+                        <input asp-for="NumeroAsegurado" class="form-control border-success border-opacity-50" placeholder="Ej: ASEG-00123" />
                         <span asp-validation-for="NumeroAsegurado" class="text-danger small"></span>
+                        <div class="form-text small">Requerido por la normativa de la clínica (CK_USUARIOS_PACIENTES).</div>
                     </div>
                 </div>
 
                 <div class="text-end mt-4 pt-3 border-top">
-                    <button type="submit" class="btn btn-primary btn-lg px-5 rounded-3 fw-bold">
+                    <button type="submit" class="btn btn-success text-white btn-lg px-5 rounded-3 fw-bold shadow-sm">
                         <i class="bi bi-check-circle me-2"></i>Registrar Paciente
                     </button>
                 </div>

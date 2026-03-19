@@ -2,6 +2,7 @@
 using MageritHealth.Models;
 using MageritHealth.Models.ViewModels;
 using MageritHealth.Repositories.Interfaces;
+using MageritHealth.Services.Interfaces;
 using MageritHealth.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -19,16 +20,18 @@ namespace MageritHealth.Controllers
         private readonly IInfoClinicaRepository infoClinicaRepository;
         private readonly IPrescripcionesRepository prescripcionesRepository;
         private readonly IAnaliticasRepository analiticasRepository;
+        private readonly IExportService exportService;
 
         public PacienteController(IUsuariosRepository usuariosRepository,
             ICitasRepository citasRepository, IInfoClinicaRepository infoClinicaRepository,
-            IPrescripcionesRepository prescripcionesRepository, IAnaliticasRepository analiticasRepository)
+            IPrescripcionesRepository prescripcionesRepository, IAnaliticasRepository analiticasRepository, IExportService exportService)
         {
             this.usuariosRepository = usuariosRepository;
             this.citasRepository = citasRepository;
             this.infoClinicaRepository = infoClinicaRepository;
             this.prescripcionesRepository = prescripcionesRepository;
             this.analiticasRepository = analiticasRepository;
+            this.exportService = exportService;
         }
 
         public async Task<IActionResult> Dashboard()
@@ -37,7 +40,8 @@ namespace MageritHealth.Controllers
             string numeroAsegurado = HttpContext.User.FindFirstValue("InsuranceNumber");
             List<Cita> historialCitas = await this.citasRepository.GetHistorialCitasPacienteAsync(idUsuarioLogueado, 3);
             Cita proximaCita = await this.citasRepository.GetProximaCitaAsync(idUsuarioLogueado);
-            List<Prescripcion> medicacionActiva = await this.prescripcionesRepository.GetListaPrescripcionesByIdPacienteAsync(idUsuarioLogueado);
+            List<Prescripcion> todasPrescripciones = await this.prescripcionesRepository.GetListaPrescripcionesByIdPacienteAsync(idUsuarioLogueado);
+            List<Prescripcion> medicacionActiva = todasPrescripciones.Where(p => p.Activa).ToList();
             InfoClinicaPaciente info = await this.infoClinicaRepository.GetInfoClinicaPacienteByIdPacienteAsync(idUsuarioLogueado);
             List<AntecedenteMedico> antecedentes = await this.infoClinicaRepository.GetListaAntecedentesMedicosByIdPacienteAsync(idUsuarioLogueado);
 
@@ -83,6 +87,22 @@ namespace MageritHealth.Controllers
             ViewBag.Especialidades = new SelectList(especialidades, "IdEspecialidad", "NombreEspecialidad");
 
             return View();
+        }
+
+        public async Task<IActionResult> GetHorasDisponibles(int idDoctor, string fecha)
+        {
+            // Validar que la fecha sea correcta
+            if (DateTime.TryParse(fecha, out DateTime fechaParsed))
+            {
+                List<string> horasLibres = await this.citasRepository.GetHorasDisponiblesDoctorAsync(idDoctor, fechaParsed);
+
+                // Devolvemos el array en formato JSON para que jQuery lo entienda
+                // Ej: ["09:00", "10:30", "14:00"]
+                return Json(horasLibres);
+            }
+
+            // Si la fecha es inválida, devolvemos un array vacío
+            return Json(new List<string>());
         }
 
         public async Task<JsonResult> GetDoctoresPorEspecialidad(int idEspecialidad)
@@ -151,7 +171,7 @@ namespace MageritHealth.Controllers
         {
             int idUsuario = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
             Usuario usuario = await this.usuariosRepository.GetUsuarioByIdAsync(idUsuario);
-            EditPacienteViewModel viewModel = new EditPacienteViewModel()
+            EditUsuarioViewModel viewModel = new EditUsuarioViewModel()
             {
                 Telefono = usuario.Telefono,
                 Email = usuario.Email
@@ -161,14 +181,14 @@ namespace MageritHealth.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> EditarPerfil(EditPacienteViewModel viewModel)
+        public async Task<IActionResult> EditarPerfil(EditUsuarioViewModel viewModel)
         {
             int idUsuario = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             if (!ModelState.IsValid)
             {
                 Usuario usuario = await this.usuariosRepository.GetUsuarioByIdAsync(idUsuario);
-                EditPacienteViewModel model = new EditPacienteViewModel()
+                EditUsuarioViewModel model = new EditUsuarioViewModel()
                 {
                     Telefono = usuario.Telefono,
                     Email = usuario.Email
@@ -191,7 +211,7 @@ namespace MageritHealth.Controllers
         public async Task<IActionResult> Citas()
         {
             int idUsuario = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
-            List<Cita> citas = await this.citasRepository.GetAllCitasByIdPaciente(idUsuario);
+            List<Cita> citas = await this.citasRepository.GetAllCitasByIdPacienteAsync(idUsuario);
             return View(citas);
         }
 
@@ -200,24 +220,29 @@ namespace MageritHealth.Controllers
             MiSaludVitalViewModel viewModel = new MiSaludVitalViewModel();
 
             int idUsuario = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            int idUltimaAnalitica;
             viewModel.Analiticas = await this.analiticasRepository.GetListaAnaliticasByIdUsuarioAsync(idUsuario);
-            viewModel.Mediciones = new List<MedicionResumen>();
-            int idUltimaAnalitica = viewModel.Analiticas.OrderByDescending(a => a.FechaAnalitica).FirstOrDefault()?.IdAnalitica ?? 0;
-            List<Medicion> mediciones = await this.analiticasRepository.GetListaMedicionesByIdAnaliticaAsync(idUltimaAnalitica);
+            if (viewModel.Analiticas != null && viewModel.Analiticas.Count != 0)
+            {
+                idUltimaAnalitica = viewModel.Analiticas.OrderByDescending(a => a.FechaAnalitica).FirstOrDefault().IdAnalitica;
+                List<Medicion> mediciones = await this.analiticasRepository.GetListaMedicionesByIdAnaliticaAsync(idUltimaAnalitica);
+                foreach (Medicion medicion in mediciones)
+                {
+                    MedicionResumen resumen = new MedicionResumen();
+                    resumen.Nombre = medicion.TipoMedicion.NombreMedicion;
+                    resumen.Unidad = medicion.TipoMedicion.UnidadMedicion;
+                    resumen.Valor = medicion.ValorMedicion;
+                    resumen.Minimo = medicion.TipoMedicion.ValorMinimo;
+                    resumen.Maximo = medicion.TipoMedicion.ValorMaximo;
+                    resumen.Fecha = medicion.Analitica.FechaAnalitica;
+                    viewModel.Mediciones.Add(resumen);
+                }
+            }
+            else { }
+
             List<AntecedenteMedico> antecedentes = await this.infoClinicaRepository.GetListaAntecedentesMedicosByIdPacienteAsync(idUsuario);
             antecedentes = antecedentes.Where(a => a.Tipo.ToLower() != "alergia").ToList();
-            foreach (Medicion medicion in mediciones)
-            {
-                MedicionResumen resumen = new MedicionResumen();
-                resumen.Nombre = medicion.TipoMedicion.NombreMedicion;
-                resumen.Unidad = medicion.TipoMedicion.UnidadMedicion;
-                resumen.Valor = medicion.ValorMedicion;
-                resumen.Minimo = medicion.TipoMedicion.ValorMinimo;
-                resumen.Maximo = medicion.TipoMedicion.ValorMaximo;
-                resumen.Fecha = medicion.Analitica.FechaAnalitica;
-                viewModel.Mediciones.Add(resumen);
-            }
-            
+
             viewModel.AntecedentesMedicos = antecedentes;
 
             return View(viewModel);
@@ -241,10 +266,10 @@ namespace MageritHealth.Controllers
                     .OrderByDescending(p => p.FechaInicio)
                     .ToList(),
 
-                // Historial: La fecha de fin ya pasó
+                // Historial: La fecha de fin ya pasó y esta !Activa
                 HistorialMedicacion = todasPrescripciones
                     .Where(p => p.Activa == false)
-                    .OrderByDescending(p => p.FechaFin) // Los más recientes primero
+                    .OrderByDescending(p => p.FechaFin)
                     .ToList(),
 
                 // Alergias: Filtramos los antecedentes donde el Tipo sea 'alergia'
@@ -267,6 +292,48 @@ namespace MageritHealth.Controllers
         {
             await this.citasRepository.DeleteLogicoCitaAsync(idcita);
             return RedirectToAction("Citas");
+        }
+
+        public async Task<IActionResult> ResultadosAnalitica(int id)
+        {
+            byte[] pdfBytes = await exportService.GenerarInformeAnaliticaPdfAsync(id);
+
+            // Si por algún motivo falla (ej. no existe la analítica), devolvemos un 404
+            if (pdfBytes == null || pdfBytes.Length == 0)
+            {
+                return NotFound("No se pudo generar el informe de la analítica. Es posible que aún no haya resultados.");
+            }
+
+            // Devolvemos el archivo PDF para que el navegador lo descargue
+            string fileName = $"Resultados_Analitica_{id}_{DateTime.Now:ddMMyyyy}.pdf";
+            return File(pdfBytes, "application/pdf", fileName);
+        }
+
+        public async Task<IActionResult> DetallesRecetaPdf(int id)
+        {
+            // Ojo: aquí pasamos el idCita, tal como definiste en tu servicio
+            byte[] pdfBytes = await exportService.GenerarRecetasPorCitaPdfAsync(id);
+
+            if (pdfBytes == null || pdfBytes.Length == 0)
+            {
+                return NotFound("No se encontraron prescripciones médicas asociadas a esta cita.");
+            }
+
+            string fileName = $"Plan_Medicacion_{id}_{DateTime.Now:ddMMyyyy}.pdf";
+            return File(pdfBytes, "application/pdf", fileName);
+        }
+
+        public async Task<IActionResult> DetallesCitaPdf(int id)
+        {
+            byte[] pdfBytes = await exportService.GenerarInformeCitaPdfAsync(id);
+
+            if (pdfBytes == null || pdfBytes.Length == 0)
+            {
+                return NotFound("No se encontraron resultados para esta cita.");
+            }
+
+            string fileName = $"Detalles_Cita_{id}_{DateTime.Now:ddMMyyyy}.pdf";
+            return File(pdfBytes, "application/pdf", fileName);
         }
     }
 }

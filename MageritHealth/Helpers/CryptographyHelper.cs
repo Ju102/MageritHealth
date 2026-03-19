@@ -7,16 +7,16 @@ namespace MageritHealth.Helpers
     {
         public static byte[] EncryptPassword(string password, string salt)
         {
-            string content = password + salt; // Da igual la posición: principio, final o en medio.
-
-            SHA512 managed = SHA512.Create();
+            string content = password + salt.Trim();
             byte[] salida = Encoding.UTF8.GetBytes(content);
 
-            for (int i = 1; i <= 30; i++)
+            using (SHA512 managed = SHA512.Create())
             {
-                salida = managed.ComputeHash(salida);
+                for (int i = 1; i <= 100000; i++)
+                {
+                    salida = managed.ComputeHash(salida);
+                }
             }
-            managed.Clear();
             return salida;
         }
     }

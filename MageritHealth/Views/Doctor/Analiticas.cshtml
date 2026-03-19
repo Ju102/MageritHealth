@@ -1,0 +1,131 @@
+﻿@model List<Analitica>
+@{
+    Layout = "_DoctorLayout";
+    ViewData["Title"] = "Gestión de Analíticas";
+}
+
+<div class="container mb-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div class="mb-3 mb-md-0">
+            <h3 class="fw-bold text-dark mb-0">Control de Analíticas</h3>
+            <p class="text-muted small">Revisa, rellena y gestiona las pruebas de laboratorio de tus pacientes.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var analitica in Model.OrderByDescending(a => a.FechaAnalitica))
+            {
+                var estado = analitica.Estado.ToLower();
+
+                string borderClass = "border-info";
+                string badgeClass = "bg-info bg-opacity-10 text-info border-info";
+                string rowOpacity = "";
+
+                if (estado == "progreso")
+                {
+                    borderClass = "border-warning";
+                    badgeClass = "bg-warning bg-opacity-25 text-dark border-warning";
+                }
+                else if (estado == "realizada")
+                {
+                    borderClass = "border-primary";
+                    badgeClass = "bg-primary bg-opacity-10 text-primary border-primary";
+                }
+                else if (estado == "completada")
+                {
+                    borderClass = "border-success";
+                    badgeClass = "bg-success bg-opacity-10 text-success border-success";
+                    rowOpacity = "opacity-75";
+                }
+                else if (estado == "cancelada")
+                {
+                    borderClass = "border-danger";
+                    badgeClass = "bg-danger bg-opacity-10 text-danger border-danger";
+                    rowOpacity = "opacity-50";
+                }
+
+                <div class="col-12">
+                    <div class="doctor-card p-4 border-start @borderClass border-5 shadow-sm @rowOpacity">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 border-end d-none d-md-block text-center">
+                                <div class="text-muted small fw-bold">ID ANALÍTICA</div>
+                                <div class="fw-bold text-dark fs-5">#@analitica.IdAnalitica</div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <span class="badge @badgeClass rounded-pill mb-2 px-3 text-uppercase">@analitica.Estado</span>
+                                <h5 class="fw-bold text-dark mb-0">
+                                    @(analitica.Cita?.Paciente?.Nombre) @(analitica.Cita?.Paciente?.Apellido1)
+                                </h5>
+                                <p class="text-muted small mb-0">
+                                    <i class="bi bi-calendar-event me-1"></i>
+                                    @(estado == "completada" ? "Finalizada" : "Fecha"): @analitica.FechaAnalitica.ToString("dd MMM yyyy")
+                                </p>
+                            </div>
+
+                            <div class="col-md-3">
+                                @if (estado == "completada")
+                                {
+                                    <div class="text-muted small">Observaciones</div>
+                                    <div class="fw-normal text-muted small text-truncate" title="@analitica.Notas">
+                                        @(string.IsNullOrEmpty(analitica.Notas) ? "Sin notas" : analitica.Notas)
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-muted small">Motivo Cita</div>
+                                    <div class="fw-semibold text-dark text-truncate">@analitica.Cita?.Motivo</div>
+                                }
+                            </div>
+
+                            <div class="col-md-3 text-md-end mt-3 mt-md-0">
+                                @if (estado == "programada")
+                                {
+                                    <div class="d-flex gap-2 justify-content-md-end">
+                                        <form asp-action="CambiarEstadoAnalitica" method="post">
+                                            <input type="hidden" name="id" value="@analitica.IdAnalitica" />
+                                            <input type="hidden" name="nuevoEstado" value="cancelada" />
+                                            <button type="submit" class="btn btn-outline-danger btn-sm fw-bold rounded-3" title="Cancelar">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        </form>
+
+                                        <form asp-action="CambiarEstadoAnalitica" method="post">
+                                            <input type="hidden" name="id" value="@analitica.IdAnalitica" />
+                                            <input type="hidden" name="nuevoEstado" value="realizada" />
+                                            <button type="submit" class="btn btn-info text-white fw-bold shadow-sm">
+                                                <i class="bi bi-check2-circle me-2"></i>Marcar Realizada
+                                            </button>
+                                        </form>
+                                    </div>
+                                }
+                                else if (estado == "realizada")
+                                {
+                                    <a asp-controller="Doctor" asp-action="CompletarAnalitica" asp-route-idanalitica="@analitica.IdAnalitica" class="btn btn-primary fw-bold text-white shadow-sm">
+                                        <i class="bi bi-clipboard2-pulse me-2"></i>Cargar Resultados
+                                    </a>
+                                }
+                                else if (estado == "completada")
+                                {
+                                    <a asp-controller="Doctor" asp-action="DetallesAnaliticaPdf" asp-route-id="@analitica.IdAnalitica" class="btn btn-outline-success fw-bold shadow-sm">
+                                        <i class="bi bi-eye me-2"></i>Ver Informe
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center p-5 mt-4">
+                <i class="bi bi-clipboard2-x fs-1 text-muted opacity-25 d-block mb-3"></i>
+                <h5 class="text-muted fw-bold">No se han encontrado analíticas</h5>
+                <p class="text-muted small">No hay pruebas registradas bajo tu supervisión.</p>
+            </div>
+        }
+    </div>
+</div>

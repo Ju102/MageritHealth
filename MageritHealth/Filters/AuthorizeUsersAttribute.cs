@@ -13,7 +13,6 @@ namespace MageritHealth.Filters
 
             if (user == null || !user.Identity.IsAuthenticated)
             {
-                // Capture the intended destination before redirecting to Login
                 string controller = context.RouteData.Values["controller"]?.ToString();
                 string action = context.RouteData.Values["action"]?.ToString();
                 var id = context.RouteData.Values["id"];
@@ -35,10 +34,7 @@ namespace MageritHealth.Filters
                 provider.SaveTempData(context.HttpContext, tempData);
                 
                 context.Result = GetRoute("Account", "Login");
-            }
-            
-            // If the user is authenticated, we leave context.Result null
-            // so the request pipeline can continue executing the requested action.
+            }          
         }
 
         private RedirectToRouteResult GetRoute(string controller, string action)

@@ -1,6 +1,8 @@
-﻿using MageritHealth.Models;
+﻿using MageritHealth.Helpers;
+using MageritHealth.Models;
 using MageritHealth.Models.ViewModels;
 using MageritHealth.Repositories.Interfaces;
+using MageritHealth.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +12,13 @@ namespace MageritHealth.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IUsuariosRepository repo;
+        private readonly IUsuariosRepository usersRepository;
+        private readonly IEmailingService emailingService;
 
-        public AccountController(IUsuariosRepository repo)
+        public AccountController(IUsuariosRepository repo, IEmailingService emailingService)
         {
-            this.repo = repo;
+            this.usersRepository = repo;
+            this.emailingService = emailingService;
         }
 
         #region Login y Logout
@@ -31,7 +35,7 @@ namespace MageritHealth.Controllers
             {
                 return View(model);
             }
-            Usuario user = await this.repo.LoginUsuarioAsync(model.LoginEmail, model.LoginPassword);
+            Usuario user = await this.usersRepository.LoginUsuarioAsync(model.LoginEmail, model.LoginPassword);
 
             if (user == null)
             {
@@ -69,6 +73,8 @@ namespace MageritHealth.Controllers
                 {
                     Claim claimLicenseNumber = new Claim("LicenseNumber", user.NumeroColegiado);
                     identity.AddClaim(claimLicenseNumber);
+                    Claim claimSpecialty = new Claim("Specialty", user.Especialidad.NombreEspecialidad);
+                    identity.AddClaim(claimSpecialty);
                 }
 
                 ClaimsPrincipal principal = new ClaimsPrincipal(identity);
@@ -104,6 +110,40 @@ namespace MageritHealth.Controllers
 
         public IActionResult AccesoDenegado()
         {
+            return View();
+        }
+
+        public IActionResult Recuperacion()
+        {
+            ViewBag.EmailEnviado = false;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Recuperacion(string emailrecuperacion)
+        {
+            // 1. Validar que el campo no venga vacío
+            if (string.IsNullOrWhiteSpace(emailrecuperacion))
+            {
+                ModelState.AddModelError("Email", "El email es obligatorio.");
+                ViewBag.EmailEnviado = false;
+                return View();
+            }
+
+            Usuario usuarioExistente = await this.usersRepository.GetUsuarioByEmailAsync(emailrecuperacion);
+
+            if (usuarioExistente != null)
+            {
+                string nuevaPassword = ToolsHelper.GenerateRandomPassword();
+                await this.usersRepository.ResetPasswordUsuarioAsync(usuarioExistente.IdUsuario, nuevaPassword);
+
+                // 2. Usar el servicio para enviar el correo
+                await emailingService.SendEmailRecuperacionAsync(emailrecuperacion, nuevaPassword, usuarioExistente.Nombre);
+            }
+
+            // 3. Retornar éxito independientemente de si existía el usuario
+            ViewBag.EmailEnviado = true;
             return View();
         }
     }

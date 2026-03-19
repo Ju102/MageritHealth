@@ -16,18 +16,15 @@
 
     <style>
         :root {
-            --mh-brand: #0f4c81; /* Azul corporativo oscuro */
-            --mh-primary: #0d6efd; /* Azul acción */
+            --mh-brand: #0f4c81;
+            --mh-primary: #0d6efd;
             --mh-text-main: #1e293b;
             --mh-text-muted: #64748b;
             --mh-bg-app: #f4f7f6;
             --mh-surface: #ffffff;
-            /* Color específico para diferenciar un poco el área médica si se desea,
-                       aunque aquí mantenemos la coherencia de marca */
             --mh-doctor: #0284c7;
         }
 
-        /* --- Estilos base --- */
         body {
             background-color: var(--mh-bg-app);
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -38,16 +35,14 @@
             min-height: 100vh;
         }
 
-        /* --- Top Bar Área Médica --- */
         .top-bar-doctor {
-            background-color: var(--mh-text-main); /* Un poco más oscuro para diferenciar de paciente */
+            background-color: var(--mh-text-main);
             color: white;
             font-size: 0.8rem;
             padding: 0.4rem 0;
             font-weight: 500;
         }
 
-        /* --- Navbar Médica --- */
         .navbar-doctor {
             background: var(--mh-surface);
             box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.02);
@@ -59,7 +54,6 @@
             padding: 1rem 0;
         }
 
-        /* --- Navegación --- */
         .nav-link-doc {
             color: var(--mh-text-muted);
             font-weight: 500;
@@ -79,7 +73,6 @@
                 border-bottom-color: var(--mh-doctor);
             }
 
-        /* --- Menú de Usuario --- */
         .user-menu-btn {
             background: transparent;
             border: 1px solid #e2e8f0;
@@ -100,7 +93,6 @@
             font-size: 0.85rem;
         }
 
-        /* --- Tarjetas del Doctor --- */
         .doctor-card {
             background: var(--mh-surface);
             border: 1px solid #e2e8f0;
@@ -114,7 +106,6 @@
             box-shadow: 0 6px 12px rgba(0,0,0,0.05) !important;
         }
 
-        /* --- Footer --- */
         .footer-doctor {
             background-color: var(--mh-surface);
             border-top: 1px solid #e2e8f0;
@@ -146,7 +137,7 @@
         <div class="container">
             <a class="navbar-brand fw-bold text-dark d-flex align-items-center" asp-controller="Doctor" asp-action="Dashboard">
                 <i class="bi bi-heart-pulse-fill fs-3 me-2" style="color: var(--mh-doctor);"></i>
-                <span style="color: var(--mh-brand);">Magerit <span class="fw-normal">Clínica</span></span>
+                <span style="color: var(--mh-brand);">Magerit <span class="fw-normal">Health</span></span>
             </a>
 
             <button class="navbar-toggler border-0 shadow-none px-2 py-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -162,24 +153,20 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link nav-link-doc">
-                            Mis Pacientes
+                        <a asp-controller="Doctor" asp-action="Agenda"
+                           class="nav-link nav-link-doc @(currentAction == "Agenda" || currentAction == "Consulta" ? "active" : "")">
+                            Agenda
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a asp-controller="Doctor" asp-action="Agenda" class="nav-link nav-link-doc">
-                            Agenda
+                        <a asp-controller="Doctor" asp-action="Analiticas"
+                           class="nav-link nav-link-doc @(currentAction == "Analiticas" ? "active" : "")">
+                            Analíticas
                         </a>
                     </li>
                 </ul>
 
                 <div class="d-flex align-items-center mt-3 mt-lg-0 pb-3 pb-lg-0 gap-3">
-                    <a href="#" class="text-secondary position-relative text-decoration-none px-2 d-none d-lg-block">
-                        <i class="bi bi-bell fs-5"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
-                            <span class="visually-hidden">Nuevas notificaciones</span>
-                        </span>
-                    </a>
 
                     <div class="dropdown w-100">
                         <button class="btn user-menu-btn d-flex align-items-center w-100 justify-content-between" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -189,7 +176,7 @@
                                 </div>
                                 <div class="text-start d-lg-none d-xl-block">
                                     <span class="fw-semibold text-dark fs-6 d-block lh-1">Dr/a. @Context.User.Identity.Name</span>
-                                    <small class="text-muted" style="font-size: 0.7rem;">Cardiología</small>
+                                    <small class="text-muted" style="font-size: 0.7rem;">@Context.User.FindFirst("Specialty")?.Value</small>
                                 </div>
                             </div>
                             <i class="bi bi-chevron-down ms-2 text-muted small"></i>

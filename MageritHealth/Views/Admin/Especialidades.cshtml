@@ -1,0 +1,172 @@
+﻿@model List<MageritHealth.Models.Especialidad>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Gestión de Especialidades";
+}
+
+<div class="container mb-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div class="mb-3 mb-md-0">
+            <h3 class="fw-bold text-dark mb-0">Departamentos Médicos</h3>
+            <p class="text-muted small">Configuración de especialidades y asignación de facultativos.</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-primary fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevaEspecialidad">
+                <i class="bi bi-plus-circle-fill me-2"></i>Nueva Especialidad
+            </button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small text-muted text-uppercase">
+                        <tr>
+                            <th class="ps-4 py-3" style="width: 100px;">ID</th>
+                            <th class="py-3">Nombre de la Especialidad</th>
+                            <th class="py-3 text-center">Doctores Asignados</th>
+                            <th class="pe-4 py-3 text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                var numDoctores = item.Doctores?.Count ?? 0;
+                                <tr>
+                                    <td class="ps-4 py-3 text-muted fw-medium">#@item.IdEspecialidad</td>
+                                    <td class="py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="p-2 bg-primary bg-opacity-10 rounded-3 text-primary me-3">
+                                                <i class="bi bi-tag-fill"></i>
+                                            </div>
+                                            <span class="fw-bold text-dark">@item.NombreEspecialidad</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 text-center">
+                                        <span class="badge @(numDoctores > 0 ? "bg-info" : "bg-secondary") bg-opacity-10 @(numDoctores > 0 ? "text-info" : "text-muted") border rounded-pill px-3">
+                                            <i class="bi bi-person-badge me-1"></i>
+                                            @numDoctores Facultativo/s
+                                        </span>
+                                    </td>
+                                    <td class="pe-4 py-3 text-end">
+                                        <div class="btn-group shadow-sm rounded">
+                                            <button type="button" class="btn btn-white btn-sm border"
+                                                    onclick="gestionarEliminacion(@item.IdEspecialidad, '@item.NombreEspecialidad', @numDoctores)"
+                                                    title="Eliminar">
+                                                <i class="bi bi-trash3 text-danger"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <i class="bi bi-folder-x display-4 text-muted d-block mb-3"></i>
+                                    <p class="text-muted">No se han encontrado especialidades.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalErrorEliminar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-body p-5 text-center">
+                <div class="text-danger mb-4">
+                    <i class="bi bi-exclamation-octagon-fill" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="fw-bold text-dark">Acción Denegada</h4>
+                <p class="text-muted">No se puede eliminar la especialidad <strong id="errEspNombre" class="text-dark"></strong> porque tiene doctores asignados.</p>
+                <p class="small text-muted">Por favor, reasigne o elimine a los doctores de este departamento antes de intentar borrarlo.</p>
+                <button type="button" class="btn btn-secondary w-100 rounded-3 fw-bold mt-3" data-bs-dismiss="modal">Entendido</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalConfirmarEliminar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-body p-5 text-center">
+                <div class="text-warning mb-4">
+                    <i class="bi bi-trash3-fill" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="fw-bold text-dark">¿Estás seguro?</h4>
+                <p class="text-muted">Vas a eliminar permanentemente la especialidad: <br><strong id="confEspNombre" class="text-dark"></strong></p>
+
+                <form asp-controller="Admin" asp-action="EliminarEspecialidad" method="post">
+                    <input type="hidden" name="idespecialidad" id="inputEliminarId" value="" />
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="button" class="btn btn-light w-100 fw-bold border" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger w-100 fw-bold">Sí, Eliminar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalNuevaEspecialidad" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-bottom-0 pt-4 px-4">
+                <h5 class="fw-bold">Añadir Especialidad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-4 pb-4">
+                <form asp-controller="Admin" asp-action="CrearEspecialidad" method="post">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Nombre</label>
+                        <input name="especialidad" type="text" class="form-control rounded-3" required placeholder="Ej: Cardiología">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2 rounded-3">Guardar Especialidad</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function gestionarEliminacion(id, nombre, count) {
+            if (count > 0) {
+                // Mostrar error si tiene doctores
+                document.getElementById('errEspNombre').innerText = nombre;
+                var modalError = new bootstrap.Modal(document.getElementById('modalErrorEliminar'));
+                modalError.show();
+            } else {
+                // Mostrar confirmación si está vacía
+                document.getElementById('confEspNombre').innerText = nombre;
+                document.getElementById('inputEliminarId').value = id;
+                var modalConf = new bootstrap.Modal(document.getElementById('modalConfirmarEliminar'));
+                modalConf.show();
+            }
+        }
+    </script>
+}
+
+<style>
+    .btn-white {
+        background-color: #fff;
+    }
+
+        .btn-white:hover {
+            background-color: #f8f9fa;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.02);
+    }
+</style>

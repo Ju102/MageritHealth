@@ -1,4 +1,8 @@
-﻿@{
+﻿@using MageritHealth.Models
+@using MageritHealth.Models.ViewModels
+@model ConsultaViewModel
+
+@{
     Layout = "_DoctorLayout";
     ViewData["Title"] = "Consulta en Curso";
 }
@@ -6,70 +10,88 @@
 <div class="container mb-5">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 border-bottom pb-4">
         <div class="d-flex align-items-center mb-3 mb-md-0">
-            <a asp-controller="Doctor" asp-action="Dashboard" class="btn btn-outline-secondary rounded-circle p-2 me-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="Volver a la Agenda">
+            <a asp-controller="Doctor" asp-action="Agenda" class="btn btn-outline-secondary rounded-circle p-2 me-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="Volver a la Agenda">
                 <i class="bi bi-arrow-left"></i>
             </a>
             <div>
                 <div class="d-flex align-items-center">
                     <h3 class="fw-bold text-dark mb-0 me-3">Consulta en Curso</h3>
-                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill d-flex align-items-center py-2 px-3">
-                        <i class="bi bi-record-circle-fill me-2"></i> Grabando tiempo...
+                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary rounded-pill mt-1">
+                        ID Cita: #@Model.IdCita
                     </span>
                 </div>
             </div>
         </div>
         <div class="d-flex gap-2">
-            <button class="btn btn-light text-danger fw-bold shadow-sm rounded-3 px-3">
-                <i class="bi bi-x-circle me-1"></i> Cancelar
-            </button>
-            <button class="btn btn-success fw-bold shadow-sm rounded-3 px-4">
+            <button type="submit" form="formFinalizar" class="btn btn-success fw-bold shadow-sm rounded-3 px-4">
                 <i class="bi bi-check2-all me-2"></i> Finalizar Consulta
             </button>
         </div>
     </div>
 
     <div class="row g-4">
+        <!-- COLUMNA IZQUIERDA: RESUMEN PACIENTE -->
         <div class="col-lg-3">
             <div class="doctor-card p-4 mb-4 border-start border-primary border-5 shadow-sm text-center">
                 <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex justify-content-center align-items-center mb-3 fw-bold fs-3" style="width: 80px; height: 80px;">
-                    MD
+                    @(Model.NombrePaciente[0])@(Model.ApellidoPaciente[0])
                 </div>
-                <h5 class="fw-bold text-dark mb-1">María Díaz Martín</h5>
-                <p class="text-muted small mb-3">ID Paciente: #44444</p>
-                <span class="badge bg-light text-dark border rounded-pill px-3 py-2 mb-4">
-                    <i class="bi bi-gender-female text-danger me-1"></i> Mujer, 31 años
+                <h5 class="fw-bold text-dark mb-1">@Model.NombrePaciente @Model.ApellidoPaciente</h5>
+                <p class="text-muted small mb-3">ID Paciente: #@Model.IdPaciente</p>
+                <span class="badge bg-light text-dark border rounded-pill px-3 py-2 mb-4 text-capitalize">
+                    <i class="bi @(Model.Genero.ToLower() == "femenino" ? "bi-gender-female text-danger" : "bi-gender-male text-primary") me-1"></i> @Model.Genero, @Model.Edad años
                 </span>
 
                 <div class="text-start border-top pt-3">
                     <div class="mb-3">
-                        <small class="text-muted fw-bold d-block text-uppercase mb-1">DNI</small>
-                        <div class="text-dark small fw-medium">44444444D</div>
+                        <small class="text-muted fw-bold d-block text-uppercase mb-1">DNI / NIE</small>
+                        <div class="text-dark small fw-medium">@Model.DniPaciente</div>
                     </div>
                     <div class="mb-3">
                         <small class="text-muted fw-bold d-block text-uppercase mb-1">Teléfono</small>
-                        <div class="text-dark small fw-medium">600 777 888</div>
+                        <div class="text-dark small fw-medium">@Model.TelefonoPaciente</div>
                     </div>
                     <div class="mb-3">
-                        <small class="text-muted fw-bold d-block text-uppercase mb-1">Seguro</small>
-                        <div class="text-dark small fw-medium">Sanitas (INS-889900)</div>
+                        <small class="text-muted fw-bold d-block text-uppercase mb-1">Seguro / Asegurado</small>
+                        <div class="text-dark small fw-medium">@Model.NumeroAsegurado</div>
                     </div>
+
                     <div class="mb-0">
                         <small class="text-muted fw-bold d-block text-uppercase mb-1">Alergias Conocidas</small>
-                        <div class="p-2 bg-danger bg-opacity-10 border border-danger border-opacity-25 rounded-3 d-inline-block mt-1">
-                            <span class="text-danger fw-bold small"><i class="bi bi-exclamation-triangle-fill me-1"></i>Penicilina</span>
-                        </div>
+                        @if (Model.Antecedentes.Any(a => a.Tipo.ToLower() == "alergia"))
+                        {
+                            foreach (var alergia in Model.Antecedentes.Where(a => a.Tipo.ToLower() == "alergia"))
+                            {
+                                <div class="p-2 bg-danger bg-opacity-10 border border-danger border-opacity-25 rounded-3 d-inline-block mt-1 me-1">
+                                    <span class="text-danger fw-bold small"><i class="bi bi-exclamation-triangle-fill me-1"></i>@alergia.Nombre</span>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted small">Sin alergias registradas</span>
+                        }
                     </div>
                 </div>
             </div>
 
             <div class="doctor-card p-4 border-start border-success border-5 shadow-sm">
                 <h6 class="fw-bold text-dark mb-3"><i class="bi bi-capsule-pill text-success me-2"></i>Medicación Activa</h6>
-
                 <div class="list-group list-group-flush">
-                    <div class="list-group-item px-0 py-2 border-0 bg-transparent">
-                        <div class="fw-bold text-dark mb-1">Lorazepam <span class="text-muted fs-6 fw-normal">(1mg)</span></div>
-                        <div class="text-muted small"><i class="bi bi-calendar-x me-1"></i>Finaliza: 24/02/2026</div>
-                    </div>
+                    @if (Model.RecetasActivas.Any())
+                    {
+                        foreach (var receta in Model.RecetasActivas)
+                        {
+                            <div class="list-group-item px-0 py-2 border-0 bg-transparent border-bottom">
+                                <div class="fw-bold text-dark mb-1">@receta.Medicamento.NombreComercial <span class="text-muted fs-6 fw-normal">(@receta.Medicamento.Concentracion)</span></div>
+                                <div class="text-muted small">@receta.Instrucciones</div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted small">El paciente no toma medicación actualmente.</span>
+                    }
                 </div>
             </div>
         </div>
@@ -78,20 +100,30 @@
             <div class="doctor-card shadow-sm border-0 rounded-4 h-100 d-flex flex-column overflow-hidden">
 
                 <div class="bg-light px-4 pt-3 border-bottom">
-                    <ul class="nav nav-tabs border-bottom-0 gap-2" id="medicalTabs" role="tablist">
+                    <ul class="nav nav-tabs border-bottom-0 gap-2 flex-nowrap overflow-auto" id="medicalTabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active fw-bold text-secondary border-0 border-bottom border-primary border-3 bg-transparent rounded-0 pb-3" id="consulta-tab" data-bs-toggle="tab" data-bs-target="#consulta" type="button" role="tab">
-                                <i class="bi bi-pencil-square me-2"></i>Notas de Consulta
+                            <button class="nav-link active fw-bold text-secondary border-0 border-bottom border-primary border-3 bg-transparent rounded-0 pb-3 text-nowrap" id="consulta-tab" data-bs-toggle="tab" data-bs-target="#consulta" type="button" role="tab">
+                                <i class="bi bi-pencil-square me-2"></i>Notas
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold text-secondary border-0 border-bottom border-transparent border-3 bg-transparent rounded-0 pb-3" id="recetas-tab" data-bs-toggle="tab" data-bs-target="#recetas" type="button" role="tab">
-                                <i class="bi bi-file-medical me-2"></i>Recetas <span class="badge bg-secondary ms-1 rounded-pill">1</span>
+                            <button class="nav-link fw-bold text-secondary border-0 border-bottom border-transparent border-3 bg-transparent rounded-0 pb-3 text-nowrap" id="antecedentes-tab" data-bs-toggle="tab" data-bs-target="#antecedentes" type="button" role="tab">
+                                <i class="bi bi-clipboard2-pulse me-2"></i>Antecedentes <span class="badge bg-danger bg-opacity-25 text-danger border border-danger ms-1 rounded-pill">@Model.Antecedentes.Count</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold text-secondary border-0 border-bottom border-transparent border-3 bg-transparent rounded-0 pb-3" id="historial-tab" data-bs-toggle="tab" data-bs-target="#historial" type="button" role="tab">
-                                <i class="bi bi-clock-history me-2"></i>Historial Previo
+                            <button class="nav-link fw-bold text-secondary border-0 border-bottom border-transparent border-3 bg-transparent rounded-0 pb-3 text-nowrap" id="recetas-tab" data-bs-toggle="tab" data-bs-target="#recetas" type="button" role="tab">
+                                <i class="bi bi-file-medical me-2"></i>Recetas <span class="badge bg-secondary ms-1 rounded-pill">@Model.RecetasActivas.Count</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold text-secondary border-0 border-bottom border-transparent border-3 bg-transparent rounded-0 pb-3 text-nowrap" id="analiticas-tab" data-bs-toggle="tab" data-bs-target="#analiticas" type="button" role="tab">
+                                <i class="bi bi-droplet-half me-2"></i>Analíticas <span class="badge bg-warning text-dark ms-1 rounded-pill">@Model.AnaliticasSolicitadasHoy.Count</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold text-secondary border-0 border-bottom border-transparent border-3 bg-transparent rounded-0 pb-3 text-nowrap" id="historial-tab" data-bs-toggle="tab" data-bs-target="#historial" type="button" role="tab">
+                                <i class="bi bi-clock-history me-2"></i>Historial
                             </button>
                         </li>
                     </ul>
@@ -102,80 +134,226 @@
 
                         <div class="tab-pane fade show active" id="consulta" role="tabpanel">
                             <div class="p-4 bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded-3 mb-4">
-                                <span class="fw-bold small text-uppercase text-warning text-darken d-block mb-2">
+                                <span class="fw-bold small text-uppercase d-block mb-2" style="color: #856404 !important;">
                                     <i class="bi bi-chat-left-quote-fill me-1"></i> Motivo de la Cita (Escrito por el paciente)
                                 </span>
-                                <p class="text-dark fw-medium fst-italic mb-0">"Dolor leve en el pecho y episodios de estrés."</p>
+                                <p class="text-dark fw-medium fst-italic mb-0">"@Model.MotivoCita"</p>
                             </div>
 
-                            <form>
+                            <form id="formFinalizar" asp-action="FinalizarConsulta" method="post">
+                                <input type="hidden" asp-for="IdCita" />
+                                <input type="hidden" asp-for="IdPaciente" />
                                 <div class="mb-3">
                                     <label class="form-label fw-bold text-primary mb-3 d-block border-bottom pb-2">
-                                        <i class="bi bi-journal-text me-2"></i>Anotaciones Clínicas
+                                        <i class="bi bi-journal-text me-2"></i>Anotaciones Médicas del Encuentro
                                     </label>
-                                    <textarea class="form-control bg-light border-0 shadow-sm rounded-4 p-4" rows="12" placeholder="Escriba la anamnesis, exploración física, diagnóstico y plan de tratamiento aquí..."></textarea>
+                                    <textarea asp-for="NotasDoctor" class="form-control bg-light border-0 shadow-sm rounded-4 p-4" rows="12" placeholder="Escriba la anamnesis, exploración física, diagnóstico y plan de tratamiento aquí..."></textarea>
                                 </div>
                             </form>
                         </div>
 
-                        <div class="tab-pane fade" id="recetas" role="tabpanel">
+                        <div class="tab-pane fade" id="antecedentes" role="tabpanel">
+                            <div class="row g-4">
+                                <div class="col-md-7 border-end pe-md-4">
+                                    <h6 class="fw-bold text-dark mb-4"><i class="bi bi-clipboard2-check text-primary me-2"></i>Historial Clínico del Paciente</h6>
+                                    <div class="d-flex flex-column gap-3">
+                                        @if (Model.Antecedentes.Any())
+                                        {
+                                            foreach (var ant in Model.Antecedentes)
+                                            {
+                                                string borderClass = ant.Severidad.ToLower() == "grave" ? "border-danger" : (ant.Severidad.ToLower() == "moderada" ? "border-warning" : "border-secondary");
+                                                string badgeClass = ant.Severidad.ToLower() == "grave" ? "bg-danger" : (ant.Severidad.ToLower() == "moderada" ? "bg-warning text-dark" : "bg-light text-dark border");
+                                                string iconClass = ant.Tipo.ToLower() == "alergia" ? "bi-exclamation-triangle-fill text-danger" : "bi-heart-pulse-fill text-dark";
 
-                            <h6 class="fw-bold text-dark mb-3 border-bottom pb-2">Emitidas en esta consulta</h6>
-                            <div class="doctor-card p-3 mb-5 border-start border-success border-5 shadow-sm d-flex justify-content-between align-items-center bg-success bg-opacity-10 border-0 border-start">
-                                <div>
-                                    <div class="fw-bold text-dark fs-5 mb-1">Lorazepam</div>
-                                    <div class="text-muted small fw-bold mb-1">1mg por la noche</div>
-                                    <div class="small text-dark"><i class="bi bi-info-circle text-primary me-1"></i>Tomar en caso de ansiedad o insomnio</div>
+                                                <div class="p-3 border rounded-3 position-relative bg-white shadow-sm border-start @borderClass border-4">
+                                                    <span class="badge @badgeClass position-absolute top-0 end-0 mt-2 me-2 text-capitalize">@ant.Severidad</span>
+                                                    <div class="d-flex align-items-center mb-1">
+                                                        <i class="bi @iconClass me-2"></i>
+                                                        <span class="fw-bold text-dark text-capitalize">@ant.Tipo: @ant.Nombre</span>
+                                                    </div>
+                                                    <p class="text-muted small mb-1 fst-italic">"@ant.Notas"</p>
+                                                    <div class="text-muted" style="font-size: 0.7rem;">Diagnosticado: @ant.FechaDiagnostico.ToString()</div>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <p class="text-muted small">No hay antecedentes registrados.</p>
+                                        }
+                                    </div>
                                 </div>
-                                <div class="text-end">
-                                    <span class="badge bg-white text-dark border shadow-sm mb-2 px-3 py-2 d-block">10/02/2026 <i class="bi bi-arrow-right mx-1"></i> 24/02/2026</span>
-                                    <button class="btn btn-sm btn-outline-danger border-0 fw-bold"><i class="bi bi-trash3 me-1"></i>Eliminar</button>
-                                </div>
-                            </div>
 
-                            <div class="p-4 bg-light rounded-4 border">
-                                <h6 class="fw-bold text-primary mb-4"><i class="bi bi-plus-circle-fill me-2"></i>Añadir Nueva Prescripción</h6>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label small fw-bold text-dark">Medicamento</label>
-                                        <input type="text" class="form-control bg-white shadow-sm border-0" placeholder="Ej: Ibuprofeno">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label small fw-bold text-dark">Dosis</label>
-                                        <input type="text" class="form-control bg-white shadow-sm border-0" placeholder="Ej: 600mg cada 8 horas">
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label small fw-bold text-dark">Instrucciones al paciente</label>
-                                        <input type="text" class="form-control bg-white shadow-sm border-0" placeholder="Ej: Tomar con las comidas">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold text-dark">Fecha Inicio</label>
-                                        <input type="date" class="form-control bg-white shadow-sm border-0" value="2026-02-25">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold text-dark">Fecha Fin</label>
-                                        <input type="date" class="form-control bg-white shadow-sm border-0">
-                                    </div>
-                                    <div class="col-md-4 d-flex align-items-end">
-                                        <button class="btn btn-primary w-100 fw-bold shadow-sm h-100 py-2"><i class="bi bi-plus-lg me-2"></i>Añadir Receta</button>
+                                <div class="col-md-5">
+                                    <div class="p-4 bg-light rounded-4 border">
+                                        <h6 class="fw-bold text-primary mb-4"><i class="bi bi-plus-circle-fill me-2"></i>Nuevo Registro</h6>
+                                        <form asp-action="AñadirAntecedente" method="post">
+                                            <input type="hidden" asp-for="IdCita" />
+                                            <input type="hidden" asp-for="IdPaciente" />
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-dark">Tipo</label>
+                                                <select asp-for="TipoAntecedente" class="form-select bg-white shadow-sm border-0" required>
+                                                    <option value="enfermedad" selected>Enfermedad Crónica</option>
+                                                    <option value="alergia">Alergia</option>
+                                                    <option value="cirugia">Intervención Quirúrgica</option>
+                                                    <option value="habito">Hábito (Tabaco, Alcohol...)</option>
+                                                    <option value="otro">Otro</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-dark">Nombre de la patología / hábito</label>
+                                                <input asp-for="NombreAntecedente" type="text" class="form-control bg-white shadow-sm border-0" placeholder="Ej: Diabetes Tipo 2" required>
+                                            </div>
+                                            <div class="mb-3 row g-2">
+                                                <div class="col-6">
+                                                    <label class="form-label small fw-bold text-dark">Severidad</label>
+                                                    <select asp-for="SeveridadAntecedente" class="form-select bg-white shadow-sm border-0">
+                                                        <option value="leve">Leve</option>
+                                                        <option value="moderada" selected>Moderada</option>
+                                                        <option value="grave">Grave</option>
+                                                        <option value="critica">Crítica</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-6">
+                                                    <label class="form-label small fw-bold text-dark">Fecha Diag.</label>
+                                                    <input asp-for="FechaDiagnostico" type="date" class="form-control bg-white shadow-sm border-0" required>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-dark">Anotaciones</label>
+                                                <textarea asp-for="NotasAntecedente" class="form-control bg-white shadow-sm border-0" rows="2" placeholder="Observaciones adicionales..."></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm py-2">
+                                                <i class="bi bi-plus-lg me-2"></i>Añadir al Historial
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="tab-pane fade" id="historial" role="tabpanel">
-                            <h6 class="fw-bold text-dark mb-4 border-bottom pb-2">Visitas Anteriores</h6>
+                        <div class="tab-pane fade" id="recetas" role="tabpanel">
+                            <h6 class="fw-bold text-dark mb-3 border-bottom pb-2">Recetas Activas del Paciente</h6>
 
-                            <div class="list-group list-group-flush">
-                                <div class="list-group-item px-0 py-3 border-bottom border-light">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="fw-bold text-dark"><i class="bi bi-calendar-check text-primary me-2"></i>15 Dic 2025 - Cardiología</span>
-                                        <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary rounded-pill">Dra. Ana Pérez</span>
-                                    </div>
-                                    <div class="p-3 bg-light rounded-3 mt-2">
-                                        <p class="small text-dark mb-0 fst-italic">"Revisión rutinaria. ECG normal. Se recomienda control de peso y dieta baja en sal."</p>
-                                    </div>
+                            @if (!Model.RecetasActivas.Any())
+                            {
+                                <p class="text-muted small">No hay recetas activas.</p>
+                            }
+                            else
+                            {
+                                <div class="row g-2 mb-4">
+                                    @foreach (var rec in Model.RecetasActivas)
+                                    {
+                                        <div class="col-md-6">
+                                            <div class="p-3 border-start border-success border-4 shadow-sm rounded-3 bg-white">
+                                                <div class="fw-bold text-dark mb-1">@rec.Medicamento.NombreComercial <span class="text-muted small">(@rec.Medicamento.Concentracion)</span></div>
+                                                <div class="text-muted small mb-1"><i class="bi bi-info-circle text-primary me-1"></i>@rec.Instrucciones</div>
+                                                <div class="badge bg-light text-dark border d-inline-block">Hasta: @rec.FechaFin.ToString("dd/MM/yyyy")</div>
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
+                            }
+
+                            <div class="p-4 bg-light rounded-4 border mt-4">
+                                <h6 class="fw-bold text-primary mb-4"><i class="bi bi-plus-circle-fill me-2"></i>Añadir Nueva Prescripción</h6>
+                                <form asp-action="AñadirReceta" method="post" class="row g-3">
+                                    <input type="hidden" asp-for="IdCita" />
+                                    <input type="hidden" asp-for="IdPaciente" />
+
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-dark">Medicamento</label>
+                                        <select asp-for="NuevoMedicamentoId" class="form-select bg-white shadow-sm border-0" required>
+                                            <option value="">-- Selecciona medicamento --</option>
+                                            @if (ViewBag.Medicamentos != null)
+                                            {
+                                                foreach (var med in ViewBag.Medicamentos)
+                                                {
+                                                    <option value="@med.IdMedicamento">@med.NombreComercial - @med.Concentracion</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-dark">Instrucciones / Dosis</label>
+                                        <input asp-for="InstruccionesReceta" type="text" class="form-control bg-white shadow-sm border-0" placeholder="Ej: 1 comprimido cada 8 horas" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-dark">Fecha Fin Prevista</label>
+                                        <input asp-for="FechaFinReceta" type="date" class="form-control bg-white shadow-sm border-0" required>
+                                    </div>
+                                    <div class="col-md-6 d-flex align-items-end">
+                                        <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm h-100 py-2"><i class="bi bi-plus-lg me-2"></i>Añadir Receta</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="analiticas" role="tabpanel">
+                            <h6 class="fw-bold text-dark mb-3 border-bottom pb-2">Analíticas solicitadas en esta consulta</h6>
+
+                            @if (Model.AnaliticasSolicitadasHoy.Any())
+                            {
+                                foreach (var an in Model.AnaliticasSolicitadasHoy)
+                                {
+                                    <div class="p-3 border rounded-3 mb-2 bg-warning bg-opacity-10 border-warning">
+                                        <span class="badge bg-warning text-dark me-2">Solicitada</span>
+                                        <strong>Analítica #@an.IdAnalitica</strong> - @an.FechaAnalitica.ToShortDateString()
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="p-4 text-center bg-light rounded-4 mb-4 border border-dashed">
+                                    <i class="bi bi-droplet-half fs-1 text-muted opacity-50 mb-2 d-block"></i>
+                                    <p class="text-muted small mb-0">No se han solicitado pruebas para este paciente en esta sesión.</p>
+                                </div>
+                            }
+
+                            <div class="p-4 bg-light rounded-4 border mt-4">
+                                <h6 class="fw-bold text-warning text-darken mb-4" style="color: #856404 !important;"><i class="bi bi-plus-circle-fill me-2"></i>Nueva Solicitud de Prueba</h6>
+                                <form asp-action="SolicitarAnalitica" method="post" class="row g-3">
+                                    <input type="hidden" asp-for="IdCita" />
+                                    <input type="hidden" asp-for="IdPaciente" />
+
+                                    <div class="col-md-8">
+                                        <label class="form-label small fw-bold text-dark">Instrucciones / Tipo de Análisis</label>
+                                        <input asp-for="InstruccionesAnalitica" type="text" class="form-control bg-white shadow-sm border-0" placeholder="Ej: Analítica completa, perfil lipídico. Ayuno mínimo de 12h." required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold text-dark">Fecha para la prueba</label>
+                                        <input asp-for="FechaAnalitica" type="date" class="form-control bg-white shadow-sm border-0" required>
+                                    </div>
+                                    <div class="col-12 d-flex justify-content-end mt-4">
+                                        <button type="submit" class="btn btn-warning fw-bold text-dark shadow-sm px-4 py-2"><i class="bi bi-plus-lg me-2"></i>Añadir Solicitud</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="historial" role="tabpanel">
+                            <h6 class="fw-bold text-dark mb-4 border-bottom pb-2">Visitas Anteriores (Completadas)</h6>
+                            <div class="list-group list-group-flush">
+                                @if (Model.HistorialCitasCompletadas.Any())
+                                {
+                                    foreach (var citaPasada in Model.HistorialCitasCompletadas)
+                                    {
+                                        <div class="list-group-item px-0 py-3 border-bottom border-light">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="fw-bold text-dark"><i class="bi bi-calendar-check text-primary me-2"></i>@citaPasada.FechaHora.ToString("dd MMM yyyy")</span>
+                                                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary rounded-pill">
+                                                    Dr/a. @citaPasada.Doctor.Apellido1
+                                                </span>
+                                            </div>
+                                            <div class="p-3 bg-light rounded-3 mt-2">
+                                                <p class="small text-dark mb-0 fst-italic">"@citaPasada.Notas"</p>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <p class="text-muted small">No hay visitas anteriores completadas.</p>
+                                }
                             </div>
                         </div>
 
@@ -186,19 +364,34 @@
     </div>
 </div>
 
+<style>
+    .flex-nowrap {
+        white-space: nowrap;
+    }
+
+    .border-dashed {
+        border-style: dashed !important;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background-color: #fff !important;
+        border: 1px solid #0d6efd !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15) !important;
+    }
+</style>
+
 @section Scripts {
     <script>
-        // Script simple para cambiar el estilo de las pestañas al hacer clic
         document.addEventListener('DOMContentLoaded', function () {
             var tabs = document.querySelectorAll('#medicalTabs .nav-link');
             tabs.forEach(function(tab) {
                 tab.addEventListener('click', function() {
                     tabs.forEach(t => {
-                        t.classList.remove('border-primary', 'text-dark');
+                        t.classList.remove('border-primary', 'text-dark', 'active');
                         t.classList.add('border-transparent', 'text-secondary');
                     });
                     this.classList.remove('border-transparent', 'text-secondary');
-                    this.classList.add('border-primary', 'text-dark');
+                    this.classList.add('border-primary', 'text-dark', 'active');
                 });
             });
         });

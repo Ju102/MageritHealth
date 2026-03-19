@@ -1,0 +1,192 @@
+﻿@model List<MageritHealth.Models.Usuario>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Gestión de Usuarios";
+}
+
+<div class="container mb-5">
+    <!-- CABECERA -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div class="mb-3 mb-md-0">
+            <h3 class="fw-bold text-dark mb-0">Directorio de Usuarios</h3>
+            <p class="text-muted small">Administración de credenciales, roles y datos personales del sistema.</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <div class="dropdown">
+                <button class="btn btn-primary fw-bold shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-plus-fill me-2"></i>Registrar Nuevo
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3">
+                    <li><a class="dropdown-item" asp-action="RegisterPaciente"><i class="bi bi-person me-2 text-success"></i>Paciente</a></li>
+                    <li><a class="dropdown-item" asp-action="RegisterDoctor"><i class="bi bi-heart-pulse me-2 text-info"></i>Doctor</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" asp-action="RegisterAdmin"><i class="bi bi-shield-lock me-2 text-warning"></i>Administrador</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- BARRA DE BÚSQUEDA Y FILTROS -->
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="card-body p-4">
+            <form method="post" asp-action="Usuarios" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label small fw-bold text-muted">Buscar por DNI / NIE</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="dni" class="form-control border-start-0 ps-0" placeholder="Ej: 12345678Z" value="@ViewContext.HttpContext.Request.Query["dni"]">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-bold text-muted">Filtrar por Tipo</label>
+                    <select name="rol" class="form-select">
+                        <option value="">Todos los roles</option>
+                        <option value="paciente">Pacientes</option>
+                        <option value="doctor">Doctores</option>
+                        <option value="admin">Administradores</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-dark w-100 fw-bold">
+                        <i class="bi bi-funnel-fill me-2"></i>Aplicar Filtros
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TABLA DE RESULTADOS -->
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small text-muted text-uppercase">
+                        <tr>
+                            <th class="ps-4 py-3">Nombre y Apellidos</th>
+                            <th class="py-3">Identificación (DNI)</th>
+                            <th class="py-3">Rol / Tipo</th>
+                            <th class="py-3">Información Relevante</th>
+                            <th class="py-3 text-center">Estado</th>
+                            <th class="pe-4 py-3 text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var user in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle me-3">
+                                                @(user.Nombre.Substring(0, 1))@(user.Apellido1.Substring(0, 1))
+                                            </div>
+                                            <div>
+                                                <span class="fw-bold text-dark d-block">@user.Nombre @user.Apellido1 @user.Apellido2</span>
+                                                <small class="text-muted">@user.Email</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 fw-medium text-dark">
+                                        @user.Dni
+                                    </td>
+                                    <td class="py-3">
+                                        @{
+                                            string badgeClass = user.Rol.ToLower() switch
+                                            {
+                                                "admin" => "bg-dark",
+                                                "doctor" => "bg-info text-info",
+                                                "paciente" => "bg-success text-success",
+                                                _ => "bg-secondary"
+                                            };
+                                        }
+                                        <span class="badge @badgeClass bg-opacity-10 border rounded-pill px-3 text-uppercase" style="font-size: 0.7rem;">
+                                            <i class="bi bi-circle-fill me-1 small"></i> @user.Rol
+                                        </span>
+                                    </td>
+                                    <td class="py-3 small">
+                                        @if (user.Rol.ToLower() == "doctor")
+                                        {
+                                            <div class="text-dark"><i class="bi bi-briefcase me-1"></i> Col: @(user.NumeroColegiado ?? "---")</div>
+                                            <div class="text-muted text-truncate" style="max-width: 150px;">@(user.Especialidad?.NombreEspecialidad ?? "Sin especialidad")</div>
+                                        }
+                                        else if (user.Rol.ToLower() == "paciente")
+                                        {
+                                            <div class="text-dark"><i class="bi bi-shield-check me-1"></i> Aseg: @(user.NumeroAsegurado ?? "---")</div>
+                                            <div class="text-muted small">Tlf: @user.Telefono</div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted italic">Acceso total sistema</span>
+                                        }
+                                    </td>
+                                    <td class="py-3 text-center">
+                                        @if (user.Activo)
+                                        {
+                                            <span class="text-success" title="Activo"><i class="bi bi-check-circle-fill fs-5"></i></span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger" title="Inactivo"><i class="bi bi-x-circle-fill fs-5"></i></span>
+                                        }
+                                    </td>
+                                    <td class="pe-4 py-3 text-end">
+                                        <a asp-action="DetallesUsuario" asp-route-id="@user.IdUsuario" class="btn btn-white btn-sm border shadow-sm px-3 fw-bold">
+                                            <i class="bi bi-eye-fill me-1 text-primary"></i> Detalles
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <i class="bi bi-people display-4 text-muted d-block mb-3"></i>
+                                    <p class="text-muted mb-0">No se han encontrado usuarios con los criterios de búsqueda.</p>
+                                    <a asp-action="Usuarios" class="btn btn-link btn-sm mt-2">Limpiar filtros</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        background-color: #e9ecef;
+        color: #495057;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.85rem;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .btn-white {
+        background-color: #fff;
+    }
+
+        .btn-white:hover {
+            background-color: #f8f9fa;
+            border-color: #adb5bd !important;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.02);
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "•";
+        color: #dee2e6;
+    }
+</style>

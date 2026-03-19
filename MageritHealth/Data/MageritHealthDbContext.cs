@@ -16,6 +16,7 @@ namespace MageritHealth.Data
         public DbSet<InfoClinicaPaciente> InfoClinicaPacientes { get; set; }
         public DbSet<Medicamento> Medicamentos { get; set; }
         public DbSet<Medicion> Mediciones { get; set; }
+        public DbSet<Notificacion> Notificaciones { get; set; }
         public DbSet<Prescripcion> Prescripciones { get; set; }
         public DbSet<TipoMedicion> TiposMedicion { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
@@ -24,63 +25,73 @@ namespace MageritHealth.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Evitar borrado en cascada en Citas (Ruta Paciente)
-            modelBuilder.Entity<Cita>()
-                .HasOne(c => c.Paciente)
-                .WithMany(u => u.CitasComoPaciente)
-                .HasForeignKey(c => c.IdPaciente)
-                .OnDelete(DeleteBehavior.Restrict);
+            // --- CONFIGURACIÓN DE USUARIO ---
+            modelBuilder.Entity<Usuario>(entity =>
+            {
+                entity.HasIndex(u => u.Dni).IsUnique();
+                entity.HasIndex(u => u.Email).IsUnique();
 
-            // Evitar borrado en cascada en Citas (Ruta Doctor)
-            modelBuilder.Entity<Cita>()
-                .HasOne(c => c.Doctor)
-                .WithMany(u => u.CitasComoDoctor)
-                .HasForeignKey(c => c.IdDoctor)
-                .OnDelete(DeleteBehavior.Restrict);
+                // Relación 1:Especialidad (Evitar borrado si hay doctores)
+                entity.HasOne(u => u.Especialidad)
+                    .WithMany(e => e.Doctores)
+                    .HasForeignKey(u => u.IdEspecialidad)
+                    .OnDelete(DeleteBehavior.Restrict);
 
-            // Evitar borrado de especialidades si tienen doctores
-            modelBuilder.Entity<Usuario>()
-                .HasOne(u => u.Especialidad)
-                .WithMany(e => e.Doctores)
-                .HasForeignKey(u => u.IdEspecialidad)
-                .OnDelete(DeleteBehavior.Restrict);
+                // Relación 1:1 con Credenciales
+                entity.HasOne(u => u.Credencial)
+                    .WithOne(c => c.Usuario)
+                    .HasForeignKey<Credencial>(c => c.IdUsuario);
 
-            // Indicar que la relación con Credenciales es 1:1
-            modelBuilder.Entity<Usuario>()
-                .HasOne(u => u.Credencial)
-                .WithOne(c => c.Usuario)
-                .HasForeignKey<Credencial>(c => c.IdUsuario);
+                // Relación 1:1 con Info Clínica
+                entity.HasOne(u => u.InfoClinica)
+                    .WithOne(i => i.Paciente)
+                    .HasForeignKey<InfoClinicaPaciente>(i => i.IdPaciente);
+            });
 
-            // Para las mediciones (Glucosa, Peso, etc.)
+            // --- CONFIGURACIÓN DE CITA (Combinada) ---
+            modelBuilder.Entity<Cita>(entity =>
+            {
+                // Relación con Paciente
+                entity.HasOne(c => c.Paciente)
+                    .WithMany(u => u.CitasComoPaciente)
+                    .HasForeignKey(c => c.IdPaciente)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Relación con Doctor
+                entity.HasOne(c => c.Doctor)
+                    .WithMany(u => u.CitasComoDoctor)
+                    .HasForeignKey(c => c.IdDoctor)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Relación con Analíticas
+                entity.HasMany(c => c.Analiticas)
+                    .WithOne(a => a.Cita)
+                    .HasForeignKey(a => a.IdCita)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // --- CONFIGURACIÓN DE PRECISIONES DECIMALES ---
             modelBuilder.Entity<Medicion>()
-                .Property(m => m.ValorMedicion)
-                .HasPrecision(10, 2);
+                .Property(m => m.ValorMedicion).HasPrecision(10, 2);
 
-            // Para los tipos de medicion (Rangos)
-            modelBuilder.Entity<TipoMedicion>()
-                .Property(tm => tm.ValorMaximo).HasPrecision(10, 2);
-            modelBuilder.Entity<TipoMedicion>()
-                .Property(tm => tm.ValorMinimo).HasPrecision(10, 2);
+            modelBuilder.Entity<TipoMedicion>(entity =>
+            {
+                entity.Property(tm => tm.ValorMaximo).HasPrecision(10, 2);
+                entity.Property(tm => tm.ValorMinimo).HasPrecision(10, 2);
+            });
 
-            // Para la info clínica (Peso)
             modelBuilder.Entity<InfoClinicaPaciente>()
                 .Property(i => i.PesoActual).HasPrecision(5, 2);
 
-            // Indicar que el Dni es unico
-            modelBuilder.Entity<Usuario>()
-                .HasIndex(u => u.Dni)
-                .IsUnique();
-
-            // Indicar que el email es unico
-            modelBuilder.Entity<Usuario>()
-                .HasIndex(u => u.Email)
-                .IsUnique();
-
-            // Indicar que la relación con InfoClinicaPaciente es 1:1
-            modelBuilder.Entity<Usuario>()
-                .HasOne(u => u.InfoClinica)
-                .WithOne(i => i.Paciente) // Asumiendo que pusiste "public virtual Usuario Paciente { get; set; }" en InfoClinicaPaciente
-                .HasForeignKey<InfoClinicaPaciente>(i => i.IdPaciente);
+            // --- CONFIGURACIÓN DE ANALÍTICA ---
+            modelBuilder.Entity<Analitica>(entity =>
+            {
+                // Mapeo explícito de la clave foránea desde la tabla dependiente
+                entity.HasOne(a => a.Cita)
+                      .WithMany(c => c.Analiticas) // Asumiendo que en Cita tienes public ICollection<Analitica> Analiticas { get; set; }
+                      .HasForeignKey(a => a.IdCita)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
         }
     }
 }

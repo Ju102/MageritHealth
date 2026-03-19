@@ -1,0 +1,124 @@
+﻿@using MageritHealth.Models.ViewModels
+@model EditUsuarioViewModel
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Editar Mi Perfil";
+}
+
+<div class="container mb-5">
+
+    <div class="d-flex align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-0">Configuración de Cuenta</h3>
+            <p class="text-muted small mb-0">Gestiona tus credenciales de acceso y datos de contacto administrativo.</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <form asp-controller="Admin" asp-action="EditarPerfil" method="post" class="needs-validation">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-4 shadow-sm border-0 mb-4" role="alert"></div>
+
+                <!-- SECCIÓN 1: CONTACTO -->
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="card-header bg-white pt-4 px-4 border-0">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-person-lines-fill text-primary me-2"></i>Información de Contacto
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label asp-for="Telefono" class="form-label fw-bold text-muted small">Número de Teléfono</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0 rounded-start-3"><i class="bi bi-telephone text-muted"></i></span>
+                                    <input asp-for="Telefono" class="form-control bg-light border-0 rounded-end-3 py-2" placeholder="Ej: 600123456" />
+                                </div>
+                                <span asp-validation-for="Telefono" class="text-danger small mt-1 d-block"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label fw-bold text-muted small">Correo Electrónico Laboral</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0 rounded-start-3"><i class="bi bi-envelope text-muted"></i></span>
+                                    <input asp-for="Email" type="email" class="form-control bg-light border-0 rounded-end-3 py-2" placeholder="admin@magerithealth.com" />
+                                </div>
+                                <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-10">
+                            <p class="small text-primary mb-0">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                Estos datos serán visibles para otros administradores y se usarán para recuperar la cuenta.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 2: SEGURIDAD -->
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="card-header bg-white pt-4 px-4 border-0">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-shield-lock-fill text-warning me-2"></i>Seguridad y Acceso
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="p-3 bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded-4 mb-4 d-flex align-items-center">
+                            <i class="bi bi-exclamation-triangle-fill text-warning fs-4 me-3 ms-2"></i>
+                            <span class="small text-dark fw-medium">Si no deseas cambiar tu contraseña actual, deja los campos de nueva contraseña vacíos.</span>
+                        </div>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label asp-for="Password" class="form-label fw-bold text-muted small">Nueva Contraseña</label>
+                                <input asp-for="Password" type="password" class="form-control bg-light border-0 rounded-3 py-2" placeholder="••••••••" />
+                                <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="ConfirmPassword" class="form-label fw-bold text-muted small">Confirmar Nueva Contraseña</label>
+                                <input asp-for="ConfirmPassword" type="password" class="form-control bg-light border-0 rounded-3 py-2" placeholder="••••••••" />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOTONES DE ACCIÓN -->
+                <div class="d-flex justify-content-end gap-3 mt-4">
+                    <a asp-controller="Admin" asp-action="MiPerfil" class="btn btn-light fw-bold px-4 py-2 border rounded-3">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary fw-bold shadow-sm px-4 py-2 rounded-3">
+                        <i class="bi bi-save2 me-2"></i>Actualizar Perfil
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<style>
+    .form-control:focus {
+        background-color: #fff !important;
+        border: 1px solid #0d6efd !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+    }
+
+    .input-group-text {
+        border: none;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "•";
+        color: #dee2e6;
+    }
+</style>

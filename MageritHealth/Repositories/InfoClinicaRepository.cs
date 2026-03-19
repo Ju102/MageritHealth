@@ -14,6 +14,12 @@ namespace MageritHealth.Repositories
             this.context = context;
         }
 
+        /* VIEWS: Paciente- */
+        public async Task<InfoClinicaPaciente> GetInfoClinicaPacienteByIdPacienteAsync(int idPaciente)
+        {
+            return await this.context.InfoClinicaPacientes.FirstOrDefaultAsync(i => i.IdPaciente == idPaciente);
+        }
+
         public async Task DeleteLogicoAntecedenteMedicoAsync(int idAntecedente)
         {
             AntecedenteMedico antecedenteMedico = await this.context.AntecedentesMedicos.FirstOrDefaultAsync(a => a.IdAntecedente == idAntecedente);
@@ -22,11 +28,6 @@ namespace MageritHealth.Repositories
                 antecedenteMedico.Activo = false;
                 await this.context.SaveChangesAsync();
             }
-        }
-
-        public async Task<InfoClinicaPaciente> GetInfoClinicaPacienteByIdPacienteAsync(int idPaciente)
-        {
-            return await this.context.InfoClinicaPacientes.FirstOrDefaultAsync(i => i.IdPaciente == idPaciente);
         }
 
         public async Task<List<AntecedenteMedico>> GetListaAntecedentesMedicosByIdPacienteAsync(int idPaciente)

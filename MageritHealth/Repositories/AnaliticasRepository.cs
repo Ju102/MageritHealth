@@ -25,6 +25,20 @@ namespace MageritHealth.Repositories
             }
         }
 
+        public async Task<List<Analitica>> GetAllAnaliticasAsync()
+        {
+            return await this.context.Analiticas.Include(a => a.Mediciones).Include(a => a.Cita.Doctor).Include(a => a.Cita.Paciente).ToListAsync();
+        }
+
+        public async Task<List<Analitica>> GetAnaliticaByIdDoctorAsync(int idDoctor)
+        {
+            return await this.context.Analiticas.Include(a => a.Mediciones).Include(a => a.Cita.Doctor).Include(a => a.Cita.Paciente).Where(a => a.Cita.IdDoctor == idDoctor).ToListAsync();
+        }
+
+        public async Task<int> GetRecuentoProximasAnaliticasAsync()
+        {
+            return await this.context.Analiticas.CountAsync(a => a.Estado == "programada" && a.FechaAnalitica > DateTime.Now);
+        }
 
         public async Task<TipoMedicion> FindTipoMedicionByIdAsync(int idTipo)
         {
@@ -33,17 +47,17 @@ namespace MageritHealth.Repositories
 
         public async Task<Analitica> GetAnaliticaByIdAsync(int idAnalitica)
         {
-            return await this.context.Analiticas.FirstOrDefaultAsync(a => a.IdAnalitica == idAnalitica);
+            return await this.context.Analiticas.Include(a => a.Cita.Doctor).Include(a => a.Cita.Paciente).FirstOrDefaultAsync(a => a.IdAnalitica == idAnalitica);
         }
 
-        public async Task<Analitica> GetAnaliticaByIdCitaAsync(int idCita)
+        public async Task<List<Analitica>> GetAnaliticasByIdCitaAsync(int idCita)
         {
-            return await this.context.Analiticas.FirstOrDefaultAsync(a => a.IdCita == idCita);
+            return await this.context.Analiticas.Where(a => a.IdCita == idCita).ToListAsync();
         }
 
         public async Task<List<Analitica>> GetListaAnaliticasByIdUsuarioAsync(int idUsuario)
         {
-            return await this.context.Analiticas.Where(a => a.Cita.IdPaciente == idUsuario).ToListAsync();
+            return await this.context.Analiticas.Include(a => a.Mediciones).Include(a => a.Cita.Doctor).Where(a => a.Cita.IdPaciente == idUsuario).ToListAsync();
         }
 
         public async Task<List<Medicion>> GetListaMedicionesByIdAnaliticaAsync(int idAnalitica)
@@ -57,7 +71,7 @@ namespace MageritHealth.Repositories
 
         public async Task<List<TipoMedicion>> GetListaTiposMedicionAsync()
         {
-            return await this.context.TiposMedicion.Where(tm => tm.Activo).ToListAsync();
+            return await this.context.TiposMedicion.Include(t => t.Mediciones).Where(tm => tm.Activo).ToListAsync();
         }
 
         public async Task InsertAnaliticaAsync(int idCita, DateTime fecha, string? notas)
@@ -85,11 +99,11 @@ namespace MageritHealth.Repositories
 
             foreach (Medicion med in mediciones)
             {
-                currentMaxId++;
-                med.IdMedicion = currentMaxId;
+                med.IdMedicion = currentMaxId + 1;
                 med.IdAnalitica = idAnalitica;
 
                 await this.context.Mediciones.AddAsync(med);
+                currentMaxId++;
             }
 
             analitica.Estado = "completada";
@@ -101,6 +115,20 @@ namespace MageritHealth.Repositories
             int maxId = await this.context.TiposMedicion.MaxAsync(t => (int?)t.IdTipoMedicion) ?? 0;
             tipo.IdTipoMedicion = maxId + 1;
             await this.context.TiposMedicion.AddAsync(tipo);
+            await this.context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAnaliticaRealizada(int idAnalitica)
+        {
+            Analitica analitica = await this.context.Analiticas.FirstOrDefaultAsync(a => a.IdAnalitica == idAnalitica);
+            analitica.Estado = "realizada";
+            await this.context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAnaliticaCompletada(int idAnalitica)
+        {
+            Analitica analitica = await this.context.Analiticas.FirstOrDefaultAsync(a => a.IdAnalitica == idAnalitica);
+            analitica.Estado = "completada";
             await this.context.SaveChangesAsync();
         }
 
