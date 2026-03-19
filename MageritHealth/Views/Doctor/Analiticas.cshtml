@@ -86,14 +86,6 @@
                                     <div class="d-flex gap-2 justify-content-md-end">
                                         <form asp-action="CambiarEstadoAnalitica" method="post">
                                             <input type="hidden" name="id" value="@analitica.IdAnalitica" />
-                                            <input type="hidden" name="nuevoEstado" value="cancelada" />
-                                            <button type="submit" class="btn btn-outline-danger btn-sm fw-bold rounded-3" title="Cancelar">
-                                                <i class="bi bi-x-lg"></i>
-                                            </button>
-                                        </form>
-
-                                        <form asp-action="CambiarEstadoAnalitica" method="post">
-                                            <input type="hidden" name="id" value="@analitica.IdAnalitica" />
                                             <input type="hidden" name="nuevoEstado" value="realizada" />
                                             <button type="submit" class="btn btn-info text-white fw-bold shadow-sm">
                                                 <i class="bi bi-check2-circle me-2"></i>Marcar Realizada

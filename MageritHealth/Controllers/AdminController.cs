@@ -17,15 +17,17 @@ namespace MageritHealth.Controllers
         private readonly ICitasRepository citasRepository;
         private readonly IPrescripcionesRepository prescripcionesRepository;
         private readonly IAnaliticasRepository analiticasRepository;
-        private IEmailingService emailingService;
+        private readonly IInfoClinicaRepository infoClinicaRepository;
+        private readonly IEmailingService emailingService;
 
         public AdminController(IUsuariosRepository usersRepository, ICitasRepository citasRepository,
-            IPrescripcionesRepository prescripcionesRepository, IAnaliticasRepository analiticasRepository, IEmailingService emailingService)
+            IPrescripcionesRepository prescripcionesRepository, IAnaliticasRepository analiticasRepository, IInfoClinicaRepository infoClinicaRepository, IEmailingService emailingService)
         {
             this.usersRepository = usersRepository;
             this.citasRepository = citasRepository;
             this.prescripcionesRepository = prescripcionesRepository;
             this.analiticasRepository = analiticasRepository;
+            this.infoClinicaRepository = infoClinicaRepository;
             this.emailingService = emailingService;
         }
 
@@ -314,6 +316,10 @@ namespace MageritHealth.Controllers
                     NumeroAsegurado = model.NumeroAsegurado
                 };
                 await this.usersRepository.InsertUsuarioAsync(paciente, passwordGenerada);
+                Usuario usuario = await this.usersRepository.GetUsuarioByEmailAsync(emailGenerado);
+                await this.infoClinicaRepository.InsertInfoClinicaPacienteAsync(usuario.IdUsuario, model.GrupoSanguineo,
+                        model.PesoActual, model.ContactoEmergenciaNombre, model.ContactoEmergenciaTelefono);
+
                 await this.emailingService.SendEmailBienvenidaAsync(emailGenerado, passwordGenerada, model.Nombre, "paciente");
                 return RedirectToAction("Dashboard");
             }

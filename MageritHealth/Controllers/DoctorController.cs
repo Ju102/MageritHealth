@@ -269,6 +269,19 @@ namespace MageritHealth.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> DetallesCitaPdf(int id)
+        {
+            byte[] pdfBytes = await exportService.GenerarInformeCitaPdfAsync(id);
+
+            if (pdfBytes == null || pdfBytes.Length == 0)
+            {
+                return NotFound("No se encontraron resultados para esta cita.");
+            }
+
+            string fileName = $"Detalles_Cita_{id}_{DateTime.Now:ddMMyyyy}.pdf";
+            return File(pdfBytes, "application/pdf", fileName);
+        }
+
         public async Task<IActionResult> DetallesAnaliticaPdf(int id)
         {
             byte[] pdfBytes = await exportService.GenerarInformeAnaliticaPdfAsync(id);

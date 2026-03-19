@@ -65,6 +65,7 @@ namespace MageritHealth.Repositories
                 GrupoSanguineo = grupo,
                 ContactoEmergenciaNombre = nombreContacto,
                 ContactoEmergenciaTelefono = telefContacto,
+                FechaActualizacion = DateTime.Now
             };
 
             await this.context.InfoClinicaPacientes.AddAsync(infoClinicaPaciente);

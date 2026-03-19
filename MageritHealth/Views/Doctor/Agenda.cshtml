@@ -160,7 +160,7 @@
                                         }
                                         else if (cita.Estado.Equals("Completada", StringComparison.OrdinalIgnoreCase))
                                         {
-                                            <button class="btn btn-sm btn-outline-secondary fw-bold shadow-sm"><i class="bi bi-file-earmark-medical me-1"></i>Ver Informe</button>
+                                            <a asp-controller="Doctor" asp-action="DetallesCitaPdf" asp-route-id="@cita.IdCita" class="btn btn-sm btn-outline-secondary fw-bold shadow-sm"><i class="bi bi-file-earmark-medical me-1"></i>Ver Informe</a>
                                         }
                                     </div>
                                 </div>
