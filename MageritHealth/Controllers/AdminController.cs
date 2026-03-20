@@ -306,6 +306,8 @@ namespace MageritHealth.Controllers
             {
                 string emailGenerado = ToolsHelper.GenerateEmailCorporativo(model.Nombre, model.Apellido1, model.Apellido2);
                 string passwordGenerada = ToolsHelper.GenerateRandomPassword();
+                // Para la correccion, todos los usuarios tendran la misma password
+                string passWordCorreccion = "12345";
                 Usuario paciente = new Usuario()
                 {
                     Nombre = model.Nombre,
@@ -318,15 +320,20 @@ namespace MageritHealth.Controllers
                     Direccion = model.Direccion,
                     Email = emailGenerado,
                     Rol = "paciente",
-                    Pass = passwordGenerada,
+                    // Pass = passwordGenerada,
+                    Pass = passWordCorreccion,
                     NumeroAsegurado = model.NumeroAsegurado
                 };
-                await this.usersRepository.InsertUsuarioAsync(paciente, passwordGenerada);
+                //await this.usersRepository.InsertUsuarioAsync(paciente, passwordGenerada);
+                await this.usersRepository.InsertUsuarioAsync(paciente, passWordCorreccion);
+
                 Usuario usuario = await this.usersRepository.GetUsuarioByEmailAsync(emailGenerado);
                 await this.infoClinicaRepository.InsertInfoClinicaPacienteAsync(usuario.IdUsuario, model.GrupoSanguineo,
                         model.PesoActual, model.ContactoEmergenciaNombre, model.ContactoEmergenciaTelefono);
 
+                /* DESACTIVADO para correccion.
                 await this.emailingService.SendEmailBienvenidaAsync(emailGenerado, passwordGenerada, model.Nombre, "paciente");
+                */
                 return RedirectToAction("Dashboard");
             }
         }
