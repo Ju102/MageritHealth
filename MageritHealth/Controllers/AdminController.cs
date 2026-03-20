@@ -131,6 +131,12 @@ namespace MageritHealth.Controllers
             return RedirectToAction("Usuarios");
         }
 
+        public async Task<IActionResult> ActivarUsuario(int id)
+        {
+            await this.usersRepository.EnableUsuarioAsync(id);
+            return RedirectToAction("Usuarios");
+        }
+
         public async Task<IActionResult> Especialidades()
         {
             List<Especialidad> especialidades = await this.usersRepository.GetListaEspecialidadesAsync();
