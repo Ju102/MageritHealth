@@ -37,7 +37,7 @@ namespace MageritHealth.Repositories
 
         public async Task<int> GetRecuentoProximasAnaliticasAsync()
         {
-            return await this.context.Analiticas.CountAsync(a => a.Estado == "programada" && a.FechaAnalitica > DateTime.Now);
+            return await this.context.Analiticas.CountAsync(a => (a.Estado == "programada" || a.Estado == "realizada") && a.FechaAnalitica > DateTime.Now);
         }
 
         public async Task<TipoMedicion> FindTipoMedicionByIdAsync(int idTipo)
@@ -58,6 +58,11 @@ namespace MageritHealth.Repositories
         public async Task<List<Analitica>> GetListaAnaliticasByIdUsuarioAsync(int idUsuario)
         {
             return await this.context.Analiticas.Include(a => a.Mediciones).Include(a => a.Cita.Doctor).Where(a => a.Cita.IdPaciente == idUsuario).ToListAsync();
+        }
+
+        public async Task<List<Analitica>> GetListaAnaliticasByIdDoctorAsync(int idUsuario)
+        {
+            return await this.context.Analiticas.Include(a => a.Mediciones).Include(a => a.Cita.Doctor).Where(a => a.Cita.IdDoctor == idUsuario && a.Estado != "completada" && a.Estado != "cancelada").ToListAsync();
         }
 
         public async Task<List<Medicion>> GetListaMedicionesByIdAnaliticaAsync(int idAnalitica)

@@ -7,7 +7,5 @@
         public int PrescripcionesRecientes { get; set; }
 
         public List<Cita> AgendaHoy { get; set; }
-
-        public List<Usuario> UltimosPacientes { get; set; }
     }
 }

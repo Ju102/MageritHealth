@@ -7,6 +7,8 @@ namespace MageritHealth.Repositories.Interfaces
         Task<List<Medicion>> GetListaMedicionesByIdAnaliticaAsync(int idAnalitica);
         Task<List<Analitica>> GetAllAnaliticasAsync();
         Task<List<Analitica>> GetListaAnaliticasByIdUsuarioAsync(int idUsuario);
+
+        Task<List<Analitica>> GetListaAnaliticasByIdDoctorAsync(int idUsuario);
         Task<List<Analitica>> GetAnaliticasByIdCitaAsync(int idCita);
         Task<Analitica> GetAnaliticaByIdAsync(int idAnalitica);
 

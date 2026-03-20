@@ -36,7 +36,7 @@ namespace MageritHealth.Controllers
         {
             int idUsuario = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
             List<Cita> citasHoy = await this.citasRepository.GetCitasHoyByIdDoctorAsync(idUsuario);
-            List<Analitica> analiticasPendientes = await this.analiticasRepository.GetListaAnaliticasByIdUsuarioAsync(idUsuario);
+            List<Analitica> analiticasPendientes = await this.analiticasRepository.GetListaAnaliticasByIdDoctorAsync(idUsuario);
             List<Prescripcion> prescripciones = await this.prescripcionesRepository.GetListaPrescripcionesHoyByIdDoctorAsync(idUsuario);
 
             DoctorDashboardViewModel viewModel = new DoctorDashboardViewModel()
@@ -44,8 +44,7 @@ namespace MageritHealth.Controllers
                 TotalCitasHoy = citasHoy.Count,
                 AnaliticasPendientes = analiticasPendientes.Count,
                 PrescripcionesRecientes = prescripciones.Count,
-                AgendaHoy = citasHoy,
-                UltimosPacientes = null
+                AgendaHoy = citasHoy
             };
 
             return View(viewModel);
@@ -257,15 +256,12 @@ namespace MageritHealth.Controllers
                         ValorMedicion = model.Valores[i]
                     });
                 }
-
-                await this.analiticasRepository.InsertMedicionesToAnaliticaAsync(analitica.IdAnalitica, nuevasMediciones);
-                await this.analiticasRepository.UpdateAnaliticaAsync(analitica.IdAnalitica, analitica);
-
-                return RedirectToAction("Analiticas");
             }
 
-            ViewBag.TiposMedicion = await this.analiticasRepository.GetListaTiposMedicionAsync();
-            return View(model);
+            await this.analiticasRepository.InsertMedicionesToAnaliticaAsync(analitica.IdAnalitica, nuevasMediciones);
+            await this.analiticasRepository.UpdateAnaliticaAsync(analitica.IdAnalitica, analitica);
+
+            return RedirectToAction("Analiticas");
         }
 
         public async Task<IActionResult> DetallesCitaPdf(int id)
