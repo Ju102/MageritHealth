@@ -14,8 +14,6 @@ namespace MageritHealth.Repositories
             this.context = context;
         }
 
-
-        /* VIEWS: Paciente-Dashboard */
         public async Task<Cita> GetProximaCitaAsync(int idPaciente)
         {
             return await this.context.Citas
@@ -26,7 +24,6 @@ namespace MageritHealth.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        /* VIEWS: Paciente-Dashboard */
         public async Task<List<Cita>> GetHistorialCitasPacienteAsync(int idPaciente, int? limit)
         {
             var query = this.context.Citas
@@ -44,7 +41,6 @@ namespace MageritHealth.Repositories
             }
         }
 
-        /* VIEWS: Paciente-Citas */
         public async Task<List<Cita>> GetAllCitasByIdPacienteAsync(int idPaciente)
         {
             return await this.context.Citas.Include(c => c.Doctor)
@@ -123,7 +119,7 @@ namespace MageritHealth.Repositories
                     .ThenInclude(d => d.Especialidad)
                     .Include(c => c.Paciente)
                 .Include(c => c.Prescripciones)
-                    .ThenInclude(p => p.Medicamento) // CRÍTICO: Si no lo incluyes, prescripcion.Medicamento será null
+                    .ThenInclude(p => p.Medicamento)
                 .FirstOrDefaultAsync(c => c.IdCita == idCita);
         }
 

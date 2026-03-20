@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Servicios (Dependency Injection Configuration / Configuración de la inyección de dependencias) //
+// Services
 
 builder.Services.AddAntiforgery();
 
@@ -58,7 +58,6 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddControllersWithViews(options => options.EnableEndpointRouting = false).AddSessionStateTempDataProvider();
 
-// Middleware (HTTP Request Pipeline Configuration / Configuración de la tubería de solicitudes HTTP) //
 
 var app = builder.Build();
 

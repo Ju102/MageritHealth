@@ -61,7 +61,6 @@ namespace MageritHealth.Controllers
             DateOnly hoy = DateOnly.FromDateTime(DateTime.Today);
             int edad = hoy.Year - paciente.FechaNacimiento.Year;
 
-            // Ajuste si aún no ha cumplido años este año
             if (paciente.FechaNacimiento > hoy.AddYears(-edad))
             {
                 edad--;

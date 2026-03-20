@@ -91,26 +91,20 @@ namespace MageritHealth.Controllers
 
         public async Task<IActionResult> GetHorasDisponibles(int idDoctor, string fecha)
         {
-            // Validar que la fecha sea correcta
             if (DateTime.TryParse(fecha, out DateTime fechaParsed))
             {
                 List<string> horasLibres = await this.citasRepository.GetHorasDisponiblesDoctorAsync(idDoctor, fechaParsed);
 
-                // Devolvemos el array en formato JSON para que jQuery lo entienda
-                // Ej: ["09:00", "10:30", "14:00"]
                 return Json(horasLibres);
             }
 
-            // Si la fecha es inválida, devolvemos un array vacío
             return Json(new List<string>());
         }
 
         public async Task<JsonResult> GetDoctoresPorEspecialidad(int idEspecialidad)
         {
-            // Buscamos solo a los médicos de esa especialidad concreta
             var doctores = await this.usuariosRepository.GetListaDoctoresByEspecialidadAsync(idEspecialidad);
 
-            // Transformamos la lista en el formato que espera el JavaScript (value, text)
             var doctoresFiltrados = doctores.Select(d => new
             {
                 value = d.IdUsuario,
@@ -126,21 +120,17 @@ namespace MageritHealth.Controllers
         {
             if (!ModelState.IsValid)
             {
-                // Si falla, hay que recargar el desplegable de especialidades antes de devolver la vista
                 var especialidades = await this.usuariosRepository.GetListaEspecialidadesAsync();
                 ViewBag.Especialidades = new SelectList(especialidades, "IdEspecialidad", "NombreEspecialidad");
                 return View(model);
             }
 
-            // A. Sacamos el ID del paciente directamente de su sesión (¡Seguridad máxima!)
             string idPacienteString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             int idPaciente = int.Parse(idPacienteString);
 
-            // B. Magia con las fechas: Unimos la Fecha (ej. 20/06/2024) y la Hora (ej. 09:30)
             TimeSpan horaCita = TimeSpan.Parse(model.Hora);
             DateTime fechaHoraFinal = model.Fecha.Date.Add(horaCita);
 
-            // C. Preparamos el objeto Cita para la base de datos
             Cita nuevaCita = new Cita
             {
                 IdPaciente = idPaciente,
@@ -152,10 +142,8 @@ namespace MageritHealth.Controllers
                 FechaCreacion = DateTime.Now
             };
 
-            // D. Guardamos usando el repositorio
             await this.citasRepository.InsertCitaAsync(idPaciente, model.IdDoctor, model.Motivo, fechaHoraFinal);
 
-            // E. Mensaje de éxito para el Dashboard
             TempData["MensajeExito"] = "Tu cita ha sido solicitada correctamente.";
 
             return RedirectToAction("Dashboard");
@@ -251,7 +239,6 @@ namespace MageritHealth.Controllers
 
         public async Task<IActionResult> Tratamientos()
         {
-            // 1. Obtener el ID del paciente logueado
             int idUsuarioLogueado = int.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             List<Prescripcion> todasPrescripciones = await this.prescripcionesRepository.GetListaPrescripcionesByIdPacienteAsync(idUsuarioLogueado);
@@ -260,19 +247,16 @@ namespace MageritHealth.Controllers
 
             TratamientosViewModel viewmodel = new TratamientosViewModel()
             {
-                // Medicación activa: La fecha de fin es mayor a hoy, o es null (tratamiento crónico)
                 MedicacionActiva = todasPrescripciones
                     .Where(p => p.Activa == true)
                     .OrderByDescending(p => p.FechaInicio)
                     .ToList(),
 
-                // Historial: La fecha de fin ya pasó y esta !Activa
                 HistorialMedicacion = todasPrescripciones
                     .Where(p => p.Activa == false)
                     .OrderByDescending(p => p.FechaFin)
                     .ToList(),
 
-                // Alergias: Filtramos los antecedentes donde el Tipo sea 'alergia'
                 Alergias = antecedentes
                     .Where(a => a.Tipo.ToLower() == "alergia")
                     .ToList()
@@ -298,20 +282,17 @@ namespace MageritHealth.Controllers
         {
             byte[] pdfBytes = await exportService.GenerarInformeAnaliticaPdfAsync(id);
 
-            // Si por algún motivo falla (ej. no existe la analítica), devolvemos un 404
             if (pdfBytes == null || pdfBytes.Length == 0)
             {
                 return NotFound("No se pudo generar el informe de la analítica. Es posible que aún no haya resultados.");
             }
 
-            // Devolvemos el archivo PDF para que el navegador lo descargue
             string fileName = $"Resultados_Analitica_{id}_{DateTime.Now:ddMMyyyy}.pdf";
             return File(pdfBytes, "application/pdf", fileName);
         }
 
         public async Task<IActionResult> DetallesRecetaPdf(int id)
         {
-            // Ojo: aquí pasamos el idCita, tal como definiste en tu servicio
             byte[] pdfBytes = await exportService.GenerarRecetasPorCitaPdfAsync(id);
 
             if (pdfBytes == null || pdfBytes.Length == 0)

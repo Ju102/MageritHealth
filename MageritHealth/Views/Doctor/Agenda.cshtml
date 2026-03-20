@@ -203,15 +203,12 @@
                     <li class="d-flex justify-content-between"><span class="text-danger fw-bold"><i class="bi bi-circle-fill me-2" style="font-size: 0.5rem;"></i>Canceladas</span> <span>@Model.CitasCanceladas</span></li>
                 </ul>
             </div>
-            <!-- CALENDARIO ESTÁTICO (MES ACTUAL) -->
             <div class="doctor-card p-4 shadow-sm border-0 bg-white">
                 @{
-                    // Lógica estática basada en el mes actual
                     DateTime mesActual = DateTime.Now;
                     DateTime primerDiaDelMes = new DateTime(mesActual.Year, mesActual.Month, 1);
                     int diasEnElMes = DateTime.DaysInMonth(mesActual.Year, mesActual.Month);
 
-                    // En C#, DayOfWeek.Sunday es 0. Transformamos para que Lunes sea 0 y Domingo 6.
                     int huecosEnBlanco = ((int)primerDiaDelMes.DayOfWeek + 6) % 7;
                 }
 
@@ -221,7 +218,6 @@
                     </h6>
                 </div>
 
-                <!-- Cabecera de días (L M X J V S D) -->
                 <div class="d-grid text-center small fw-bold text-muted mb-2" style="grid-template-columns: repeat(7, 1fr);">
                     <div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div><div>D</div>
                 </div>

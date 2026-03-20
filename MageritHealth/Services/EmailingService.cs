@@ -64,7 +64,6 @@ namespace MageritHealth.Services
 
         public async Task SendEmailBienvenidaAsync(string emailDestino, string passwordInicial, string nombreUsuario, string rolAsignado)
         {
-            // Leer configuración
             string smtpHost = this.config["SmtpConfig:Host"];
             int smtpPort = int.Parse(this.config["SmtpConfig:Port"]);
             bool useSsl = bool.Parse(this.config["SmtpConfig:UseSsl"]);
@@ -72,7 +71,6 @@ namespace MageritHealth.Services
             string smtpPassword = this.config["SmtpConfig:Password"];
             string displayName = this.config["SmtpConfig:DisplayName"];
 
-            // Determinar el título según el rol para personalizar el mensaje
             string tipoPortal = rolAsignado.ToLower() switch
             {
                 "paciente" => "Portal del Paciente",
@@ -81,7 +79,6 @@ namespace MageritHealth.Services
                 _ => "Portal de Magerit Health"
             };
 
-            // Plantilla HTML del correo
             string htmlBody = $@"
                 <div style='font-family: ""Segoe UI"", Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);'>
                     <div style='background-color: #0d6efd; padding: 25px; text-align: center; color: white;'>

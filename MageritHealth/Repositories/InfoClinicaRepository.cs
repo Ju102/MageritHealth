@@ -14,7 +14,6 @@ namespace MageritHealth.Repositories
             this.context = context;
         }
 
-        /* VIEWS: Paciente- */
         public async Task<InfoClinicaPaciente> GetInfoClinicaPacienteByIdPacienteAsync(int idPaciente)
         {
             return await this.context.InfoClinicaPacientes.FirstOrDefaultAsync(i => i.IdPaciente == idPaciente);

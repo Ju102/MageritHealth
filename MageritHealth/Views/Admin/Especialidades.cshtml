@@ -142,12 +142,10 @@
     <script>
         function gestionarEliminacion(id, nombre, count) {
             if (count > 0) {
-                // Mostrar error si tiene doctores
                 document.getElementById('errEspNombre').innerText = nombre;
                 var modalError = new bootstrap.Modal(document.getElementById('modalErrorEliminar'));
                 modalError.show();
             } else {
-                // Mostrar confirmación si está vacía
                 document.getElementById('confEspNombre').innerText = nombre;
                 document.getElementById('inputEliminarId').value = id;
                 var modalConf = new bootstrap.Modal(document.getElementById('modalConfirmarEliminar'));

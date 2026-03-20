@@ -14,7 +14,6 @@ namespace MageritHealth.Repositories
             this.context = context;
         }
 
-        /* VIEWS: Paciente-Dashboard, Paciente-Tratamientos */
         public async Task<List<Prescripcion>> GetListaPrescripcionesByIdPacienteAsync(int idPaciente)
         {
             return await this.context.Prescripciones.Include(p => p.Medicamento)

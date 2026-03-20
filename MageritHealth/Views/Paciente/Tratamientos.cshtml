@@ -132,7 +132,7 @@
                 {
                     foreach (var alergia in Model.Alergias)
                     {
-                        string badgeColor = "bg-warning text-dark"; // Por defecto leve/moderada
+                        string badgeColor = "bg-warning text-dark";
                         if (alergia.Severidad?.ToLower() == "grave" || alergia.Severidad?.ToLower() == "critica")
                         {
                             badgeColor = "bg-danger";

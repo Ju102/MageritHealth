@@ -87,7 +87,6 @@ namespace MageritHealth.Helpers
 
             for (int i = 0; i < longitud; i++)
             {
-                // GetInt32 genera un número aleatorio y seguro
                 int randomIndex = RandomNumberGenerator.GetInt32(validChars.Length);
                 passwordGenerada[i] = validChars[randomIndex];
             }

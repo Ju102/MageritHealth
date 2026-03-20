@@ -89,7 +89,7 @@ namespace MageritHealth.Repositories
             return await this.context.Usuarios.CountAsync(u => u.Rol == rol && u.Activo);
         }
 
-        public async Task<List<Usuario>> GetListaPacientesByIdDoctorAsync(int idDoctor) // en el futuro cambiara
+        public async Task<List<Usuario>> GetListaPacientesByIdDoctorAsync(int idDoctor)
         {
             return await this.context.Usuarios.Where(u => u.Rol == "paciente" && u.CitasComoPaciente.Any(c => c.IdDoctor == idDoctor) && u.Activo).Distinct().ToListAsync();
         }
@@ -101,16 +101,12 @@ namespace MageritHealth.Repositories
 
         public async Task InsertUsuarioAsync(Usuario user, string password)
         {
-            // Añadir el nuevo usuario a la BBDD
-            int maxId = await this.context.Usuarios.MaxAsync(u => (int?)u.IdUsuario) ?? 0; // para asegurar que si la tabla está vacía, el primer id sea 1
+            int maxId = await this.context.Usuarios.MaxAsync(u => (int?)u.IdUsuario) ?? 0;
             user.IdUsuario = maxId + 1;
 
-            // Generación de password segura
             string salt = ToolsHelper.GenerateSalt();
             byte[] hashedPassword = CryptographyHelper.EncryptPassword(password, salt);
 
-
-            // Creación de la credencial asociada al usuario
             int maxCredencial = await this.context.Credenciales.MaxAsync(c => (int?)c.IdCredencial) ?? 0;
             Credencial credencial = new Credencial
             {

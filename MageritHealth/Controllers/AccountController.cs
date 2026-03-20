@@ -123,7 +123,6 @@ namespace MageritHealth.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Recuperacion(string emailrecuperacion)
         {
-            // 1. Validar que el campo no venga vacío
             if (string.IsNullOrWhiteSpace(emailrecuperacion))
             {
                 ModelState.AddModelError("Email", "El email es obligatorio.");
@@ -138,11 +137,9 @@ namespace MageritHealth.Controllers
                 string nuevaPassword = ToolsHelper.GenerateRandomPassword();
                 await this.usersRepository.ResetPasswordUsuarioAsync(usuarioExistente.IdUsuario, nuevaPassword);
 
-                // 2. Usar el servicio para enviar el correo
                 await emailingService.SendEmailRecuperacionAsync(emailrecuperacion, nuevaPassword, usuarioExistente.Nombre);
             }
 
-            // 3. Retornar éxito independientemente de si existía el usuario
             ViewBag.EmailEnviado = true;
             return View();
         }

@@ -5,7 +5,6 @@
     Layout = "_PacienteLayout";
     ViewData["Title"] = "Mis Citas Médicas";
 
-    // Agrupamos los estados activos para filtrar más fácilmente
     var estadosActivos = new[] { "programada", "progreso", "en curso" };
 
     var citasProximas = Model.Where(c => estadosActivos.Contains(c.Estado.ToLower()))
@@ -37,7 +36,6 @@
                 <div class="row g-4">
                     @foreach (var cita in citasProximas)
                     {
-                        // Lógica dinámica de colores según el estado individual de la cita
                         bool enProgreso = cita.Estado.Equals("progreso", StringComparison.OrdinalIgnoreCase) || cita.Estado.Equals("en curso", StringComparison.OrdinalIgnoreCase);
 
                         string borderClass = enProgreso ? "border-warning" : "border-info";
