@@ -67,6 +67,7 @@ namespace MageritHealth.Controllers
 
             List<AntecedenteMedico> antecedentes = await this.infoClinicaRepository.GetListaAntecedentesMedicosByIdPacienteAsync(paciente.IdUsuario);
             List<Prescripcion> recetas = await this.prescripcionesRepository.GetListaPrescripcionesByIdPacienteAsync(paciente.IdUsuario);
+            List<Prescripcion> recetasActivas = recetas.Where(r => r.Activa == true).ToList();
 
             List<Cita> historial = await this.citasRepository.GetHistorialCitasPacienteAsync(paciente.IdUsuario, 3);
             var historialCompletado = historial.Where(c => c.Estado.ToLower() == "completada").ToList();
@@ -89,7 +90,7 @@ namespace MageritHealth.Controllers
                 Edad = edad,
 
                 Antecedentes = antecedentes,
-                RecetasActivas = recetas,
+                RecetasActivas = recetasActivas,
                 HistorialCitasCompletadas = historialCompletado,
                 AnaliticasSolicitadasHoy = analiticasCita
             };

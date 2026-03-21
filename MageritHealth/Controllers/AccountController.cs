@@ -137,8 +137,7 @@ namespace MageritHealth.Controllers
                 string nuevaPassword = ToolsHelper.GenerateRandomPassword();
                 await this.usersRepository.ResetPasswordUsuarioAsync(usuarioExistente.IdUsuario, nuevaPassword);
 
-                // DESACTIVADO para corrección
-                // await emailingService.SendEmailRecuperacionAsync(emailrecuperacion, nuevaPassword, usuarioExistente.Nombre);
+                await emailingService.SendEmailRecuperacionAsync(emailrecuperacion, nuevaPassword, usuarioExistente.Nombre);
             }
 
             ViewBag.EmailEnviado = true;

@@ -212,7 +212,10 @@ namespace MageritHealth.Controllers
             viewModel.Analiticas = await this.analiticasRepository.GetListaAnaliticasByIdUsuarioAsync(idUsuario);
             if (viewModel.Analiticas != null && viewModel.Analiticas.Count != 0)
             {
-                idUltimaAnalitica = viewModel.Analiticas.Where(a => a.Estado == "completada").OrderByDescending(a => a.FechaAnalitica).FirstOrDefault().IdAnalitica;
+                idUltimaAnalitica = viewModel.Analiticas
+                    .Where(a => a.Estado == "completada")
+                    .OrderByDescending(a => a.FechaAnalitica)
+                    .FirstOrDefault()?.IdAnalitica ?? 0;
                 List<Medicion> mediciones = await this.analiticasRepository.GetListaMedicionesByIdAnaliticaAsync(idUltimaAnalitica);
                 foreach (Medicion medicion in mediciones)
                 {

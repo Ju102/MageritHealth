@@ -8,17 +8,12 @@ namespace MageritHealth.Helpers
     {
         public static string GenerateSalt()
         {
-            Random rand = new Random();
-            string salt = "";
-
-            for (int i = 0; i < 50; i++)
+            byte[] saltBytes = new byte[36];
+            using (var rng = RandomNumberGenerator.Create())
             {
-                int num = rand.Next(1, 255);
-                char letra = Convert.ToChar(num);
-                salt += letra;
+                rng.GetBytes(saltBytes);
             }
-
-            return salt;
+            return Convert.ToBase64String(saltBytes);
         }
 
         public static bool CompareArrays(byte[] a, byte[] b)

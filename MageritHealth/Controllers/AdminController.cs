@@ -121,6 +121,11 @@ namespace MageritHealth.Controllers
         [HttpPost]
         public async Task<IActionResult> EditarUsuario(Usuario us)
         {
+            if (us.Pass == null) 
+            {
+                Usuario usuario = await this.usersRepository.GetUsuarioByIdAsync(us.IdUsuario);
+                us.Pass = usuario.Pass;
+            }
             await this.usersRepository.UpdateUsuarioAsync(us);
             return RedirectToAction("Usuarios");
         }
@@ -331,9 +336,9 @@ namespace MageritHealth.Controllers
                 await this.infoClinicaRepository.InsertInfoClinicaPacienteAsync(usuario.IdUsuario, model.GrupoSanguineo,
                         model.PesoActual, model.ContactoEmergenciaNombre, model.ContactoEmergenciaTelefono);
 
-                /* DESACTIVADO para correccion.
+
                 await this.emailingService.SendEmailBienvenidaAsync(emailGenerado, passwordGenerada, model.Nombre, "paciente");
-                */
+
                 return RedirectToAction("Dashboard");
             }
         }
